@@ -23,19 +23,21 @@ const Header = () => {
     <header className="bg-[#FFFFFF] flex items-center h-[98px] text-[#505050] w-full px-4">
       <div className="flex justify-between items-center w-full ">
         {/* Dynamic page title */}
-        <h1 className="text-xl font-semibold">{title}</h1>
+        <h1 className="text-2xl ms-2.5">{title}</h1>
 
         {/* Profile section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-[13px] me-[124px]">
+          <img src="/public/notification-01.svg" alt="" />
+
           <img
             src="https://i.postimg.cc/3xBtfyJ5/Ellipse-1.png"
             alt="Profile"
-            className="w-10 h-10 rounded-full object-cover border border-white"
+            className="w-[58px] h-[58px] rounded-full object-cover border"
           />
 
           <div className="leading-tight">
-            <p className="text-sm font-medium">John Doe</p>
-            <span className="text-xs text-gray-400">Admin</span>
+            <p className="text-2xl font-medium text-[#000000]">John Doe</p>
+            <span className="text-sm font-medium text-[#000000]">Admin</span>
           </div>
         </div>
       </div>
