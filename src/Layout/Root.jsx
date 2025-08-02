@@ -1,11 +1,10 @@
-import React from 'react';
 import { Outlet } from 'react-router';
 import Header from '../components/Header';
 import Sidebar from '../Components/Slidebar';
 
 const Root = () => {
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="h-screen flex overflow-hidden bg-[#edf1f4]">
       {/* Sidebar - Independent scroll */}
       <Sidebar />
 
