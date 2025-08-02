@@ -14,7 +14,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 sticky top-[98px] bg-[#FFFFFF] shadow-lg text-[#505050] h-screen pt-[98px] px-5">
+    <aside className="w-64 sticky bg-[#FFFFFF] shadow-lg text-[#505050] h-screen pt-[98px] px-5">
       <ul className="space-y-2">
         {navItems.map((item) => {
           const isActive = currentPath === item.path;

@@ -27,7 +27,7 @@ const Header = () => {
 
         {/* Profile section */}
         <div className="flex items-center gap-[13px] me-[124px]">
-          <img src="/public/notification-01.svg" alt="" />
+          <img className='me-4' src="/public/notification-01.svg" alt="" />
 
           <img
             src="https://i.postimg.cc/3xBtfyJ5/Ellipse-1.png"
