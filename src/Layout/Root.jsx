@@ -1,23 +1,24 @@
 import React from 'react';
 import { Outlet } from 'react-router';
+import Header from '../components/Header';
 import Sidebar from '../Components/Slidebar';
-import Header from '../Components/Header';
-
 
 const Root = () => {
   return (
-    <div className="h-screen flex">
-      {/* Sidebar */}
+    <div className="h-screen flex overflow-hidden">
+      {/* Sidebar - Independent scroll */}
       <Sidebar />
 
       {/* Main content area: Header + Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header will be at the top, aligned to the right */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header - Fixed at top */}
         <Header />
 
-        {/* Main content */}
-        <main className="flex-1 p-6 bg-gray-100 overflow-auto">
-          <Outlet />
+        {/* Main content - Independent scroll */}
+        <main className="flex-1 bg-gray-100 overflow-y-auto">
+          <div className="p-6">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
