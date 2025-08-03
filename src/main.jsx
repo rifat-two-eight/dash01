@@ -8,6 +8,7 @@ import {
 import Root from './Layout/Root';
 import Dashboard from './Pages/Dashboard';
 import User from './Pages/User';
+import Subscription from './Pages/Subscription';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path:"/user",
         Component:User
+      },
+      {
+        path:"/subscription",
+        Component:Subscription
       }
     ]
   },
