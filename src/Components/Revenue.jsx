@@ -25,9 +25,9 @@ const Revenue = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      {/* Legend */}
-      <div className="flex justify-between items-center mb-4 p-5">
+    <div className="bg-white p-6 rounded-xl shadow-sm h-[500px] flex flex-col">
+      {/* Header + Legend */}
+      <div className="flex justify-between items-center p-5 mb-4">
         <h2 className="text-lg ms-5 text-[#454b60] font-medium">Revenue</h2>
         <div className="flex space-x-4">
           <div className="flex items-center space-x-1">
@@ -46,66 +46,59 @@ const Revenue = () => {
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          data={revenueData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          {/* Grid lines */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          {/* Axes */}
-          <XAxis
-            dataKey="month"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 14, fill: "#666" }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 14, fill: "#666" }}
-          />
-          {/* Tooltip on hover */}
-          <Tooltip
-            cursor={{ stroke: "#ccc", strokeWidth: 1 }}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #eee",
-              borderRadius: "6px",
-              fontSize: "14px",
-            }}
-          />
-
-          {/* Monthly baseline (one line across all months) */}
-          <Line
-            type="linear"
-            dataKey={() => 0} // placeholder to use static line
-            stroke="#4A90E2"
-            strokeWidth={2}
-            dot={false}
-            isAnimationActive={false}
-            activeDot={false}
-          />
-
-          {/* Subscription Revenue */}
-          <Line
-            type="monotone"
-            dataKey="subscription"
-            stroke="#00c471"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-          />
-
-          {/* Advertisement Revenue */}
-          <Line
-            type="monotone"
-            dataKey="advertisement"
-            stroke="#ffc107"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="flex-1">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={revenueData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 14, fill: "#666" }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 14, fill: "#666" }}
+            />
+            <Tooltip
+              cursor={{ stroke: "#ccc", strokeWidth: 1 }}
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #eee",
+                borderRadius: "6px",
+                fontSize: "14px",
+              }}
+            />
+            <Line
+              type="linear"
+              dataKey={() => 0}
+              stroke="#4A90E2"
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
+              activeDot={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="subscription"
+              stroke="#00c471"
+              strokeWidth={2}
+              dot={{ r: 4 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="advertisement"
+              stroke="#ffc107"
+              strokeWidth={2}
+              dot={{ r: 4 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };
