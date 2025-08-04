@@ -8,8 +8,8 @@ const Header = () => {
     switch (path) {
       case '/dashboard':
         return 'Overview';
-      case '/feedback':
-        return 'Feedback';
+      case '/user':
+        return 'USER';
       case '/profile':
         return 'Profile';
       default:

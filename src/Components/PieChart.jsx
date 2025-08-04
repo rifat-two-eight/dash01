@@ -3,7 +3,6 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { FaChevronDown } from "react-icons/fa";
@@ -33,18 +32,18 @@ const PieChart = () => {
         </div>
       </div>
 
-      {/* Pie Chart */}
-      <div className="flex-1">
+      {/* Pie Chart - Made bigger */}
+      <div className="flex-1 mb-4">
         <ResponsiveContainer width="100%" height="100%">
           <RePieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={90}
+              innerRadius={100}  // Decreased for thinner ring
+              outerRadius={140} // Increased for wider area
               dataKey="value"
-              paddingAngle={2}
+              paddingAngle={0}
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
@@ -58,17 +57,21 @@ const PieChart = () => {
                 fontSize: "14px",
               }}
             />
-            <Legend
-              iconType="circle"
-              layout="horizontal"
-              verticalAlign="bottom"
-              align="center"
-              formatter={(value) => (
-                <span className="text-xs text-[#454b60]">{value}</span>
-              )}
-            />
           </RePieChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Custom Legend with flex justify-between */}
+      <div className="flex justify-between items-center px-4">
+        {data.map((entry, index) => (
+          <div key={entry.name} className="flex items-center gap-2">
+            <div 
+              className="w-4 h-4"
+              style={{ backgroundColor: COLORS[index] }}
+            ></div>
+            <span className="text-lg text-[#454b60]">{entry.name}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
