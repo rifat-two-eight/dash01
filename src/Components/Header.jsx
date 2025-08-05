@@ -10,8 +10,8 @@ const Header = () => {
         return 'Overview';
       case '/user':
         return 'USER';
-      case '/profile':
-        return 'Profile';
+      case '/user/id':
+        return 'Admin Dashboard';
       default:
         return '';
     }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaUser, FaEllipsisV, FaChevronDown } from 'react-icons/fa';
 import { FaRegEye } from "react-icons/fa";
+import { Link } from 'react-router';
 
 
 const User = () => {
@@ -140,12 +141,9 @@ const User = () => {
                                                 <div className="absolute right-0 bottom-10 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-[120px]">
                                                     <button 
                                                         className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
-                                                        onClick={() => {
-                                                            alert(`Show details for ${user.name}`);
-                                                            setDropdownOpen(null);
-                                                        }}
+                                                        
                                                     >
-                                                       <div className='flex items-center gap-3'><FaRegEye></FaRegEye> View Profile</div>
+                                                       <Link to={`/user/id`}><div className='flex items-center gap-3'><FaRegEye></FaRegEye> View Profile</div></Link>
                                                     </button>
                                                 </div>
                                             )}

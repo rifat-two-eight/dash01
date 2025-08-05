@@ -9,6 +9,7 @@ import Root from './Layout/Root';
 import Dashboard from './Pages/Dashboard';
 import User from './Pages/User';
 import Subscription from './Pages/Subscription';
+import UserDetails from './Pages/UserDetails';
 
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path:"/subscription",
         Component:Subscription
+      },
+      {
+        path:"/user/id",
+        Component: UserDetails
       }
     ]
   },
