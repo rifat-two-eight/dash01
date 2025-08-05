@@ -20,8 +20,8 @@ const Header = () => {
   const title = getTitle(location.pathname);
 
   return (
-    <header className="bg-[#FFFFFF] flex items-center h-[98px] text-[#505050] w-full px-4">
-      <div className="flex justify-between items-center w-full ">
+    <header className="bg-[#FFFFFF] shadow flex items-center h-[98px] text-[#505050] w-full px-4">
+      <div className="flex justify-between items-center w-full">
         {/* Dynamic page title */}
         <h1 className="text-2xl ms-2.5">{title}</h1>
 
