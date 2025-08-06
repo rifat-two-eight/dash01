@@ -10,12 +10,14 @@ import Dashboard from './Pages/Dashboard';
 import User from './Pages/User';
 import Subscription from './Pages/Subscription';
 import UserDetails from './Pages/UserDetails';
+import ErrorPage from './Pages/ErrorPage';
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    errorElement:<ErrorPage></ErrorPage>,
     children:[
       {
         path:"/dashboard",
@@ -41,6 +43,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-  <RouterProvider router={router} />,
+  <div className="inter">
+    <RouterProvider router={router} />
+  </div>
   </StrictMode>,
 )
