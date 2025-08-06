@@ -14,6 +14,8 @@ import ErrorPage from './Pages/ErrorPage';
 import Login from './Pages/Login';
 import Forgot from './Pages/Forgot';
 import SetPassword from './Pages/SetPassword';
+import NameChange from './Pages/NameChange';
+import PhotoChange from './Pages/PhotoChange';
 
 
 const router = createBrowserRouter([
@@ -51,6 +53,14 @@ const router = createBrowserRouter([
   {
     path:"/set-password",
     Component: SetPassword
+  },
+  {
+    path: "/name-change",
+    Component: NameChange
+  },
+  {
+    path: "/change-photo",
+    Component: PhotoChange
   }
 ]);
 

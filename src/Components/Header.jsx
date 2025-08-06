@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router';
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useLocation } from "react-router";
 
 const Header = () => {
   const location = useLocation();
@@ -9,14 +9,14 @@ const Header = () => {
   // Map route paths to titles
   const getTitle = (path) => {
     switch (path) {
-      case '/dashboard':
-        return 'Overview';
-      case '/user':
-        return 'USER';
-      case '/user/id':
-        return 'Admin Dashboard';
+      case "/dashboard":
+        return "Overview";
+      case "/user":
+        return "USER";
+      case "/user/id":
+        return "Admin Dashboard";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -30,9 +30,9 @@ const Header = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -54,12 +54,12 @@ const Header = () => {
 
         {/* Profile section */}
         <div className="flex items-center gap-[13px] me-[124px]">
-          <img className='me-4' src="/notification-01.svg" alt="Notification" />
+          <img className="me-4" src="/notification-01.svg" alt="Notification" />
 
           {/* Profile dropdown container */}
           <div className="relative" ref={dropdownRef}>
             {/* Clickable profile section */}
-            <div 
+            <div
               className="flex items-center gap-[13px] cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
               onClick={toggleDropdown}
             >
@@ -71,7 +71,9 @@ const Header = () => {
 
               <div className="leading-tight">
                 <p className="text-2xl font-medium text-[#000000]">John Doe</p>
-                <span className="text-sm font-medium text-[#000000]">Admin</span>
+                <span className="text-sm font-medium text-[#000000]">
+                  Admin
+                </span>
               </div>
             </div>
 
@@ -79,29 +81,31 @@ const Header = () => {
             {isDropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                 {/* Change Photo */}
-                <button
-                  onClick={() => handleDropdownAction('Change Photo')}
+                <Link to="/change-photo"><button
+                  onClick={() => handleDropdownAction("Change Photo")}
                   className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                 >
                   <img src="/public/camera.svg" alt="" />
                   Change Photo
-                </button>
+                </button></Link>
 
                 {/* Change Name */}
-                <button
-                  onClick={() => handleDropdownAction('Change Name')}
-                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                >
-                  <img src="/public/change-name.svg" alt="" />
-                  Change Name
-                </button>
+                <Link to="/name-change">
+                  <button
+                    onClick={() => handleDropdownAction("Change Name")}
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                  >
+                    <img src="/public/change-name.svg" alt="" />
+                    Change Name
+                  </button>
+                </Link>
 
                 {/* Divider */}
                 <hr className="my-2 border-gray-200" />
 
                 {/* Logout */}
                 <button
-                  onClick={() => handleDropdownAction('Logout')}
+                  onClick={() => handleDropdownAction("Logout")}
                   className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                 >
                   <img src="/public/logout.svg" alt="" />
