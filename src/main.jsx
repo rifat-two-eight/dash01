@@ -11,6 +11,9 @@ import User from './Pages/User';
 import Subscription from './Pages/Subscription';
 import UserDetails from './Pages/UserDetails';
 import ErrorPage from './Pages/ErrorPage';
+import Login from './Pages/Login';
+import Forgot from './Pages/Forgot';
+import SetPassword from './Pages/SetPassword';
 
 
 const router = createBrowserRouter([
@@ -37,6 +40,18 @@ const router = createBrowserRouter([
       }
     ]
   },
+  {
+    path: "/login",
+    Component: Login
+  },
+  {
+    path: "/forgot-password",
+    Component: Forgot
+  },
+  {
+    path:"/set-password",
+    Component: SetPassword
+  }
 ]);
 
 

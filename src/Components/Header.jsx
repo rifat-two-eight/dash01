@@ -1,7 +1,10 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 const Header = () => {
   const location = useLocation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Map route paths to titles
   const getTitle = (path) => {
@@ -19,6 +22,30 @@ const Header = () => {
 
   const title = getTitle(location.pathname);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleDropdownAction = (action) => {
+    console.log(`${action} clicked`);
+    setIsDropdownOpen(false);
+    // Add your action handlers here
+  };
+
   return (
     <header className="bg-[#FFFFFF] shadow flex items-center h-[98px] text-[#505050] w-full px-4">
       <div className="flex justify-between items-center w-full">
@@ -27,17 +54,61 @@ const Header = () => {
 
         {/* Profile section */}
         <div className="flex items-center gap-[13px] me-[124px]">
-          <img className='me-4' src="/public/notification-01.svg" alt="" />
+          <img className='me-4' src="/notification-01.svg" alt="Notification" />
 
-          <img
-            src="https://i.postimg.cc/3xBtfyJ5/Ellipse-1.png"
-            alt="Profile"
-            className="w-[58px] h-[58px] rounded-full object-cover border"
-          />
+          {/* Profile dropdown container */}
+          <div className="relative" ref={dropdownRef}>
+            {/* Clickable profile section */}
+            <div 
+              className="flex items-center gap-[13px] cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={toggleDropdown}
+            >
+              <img
+                src="https://i.postimg.cc/3xBtfyJ5/Ellipse-1.png"
+                alt="Profile"
+                className="w-[58px] h-[58px] rounded-full object-cover border"
+              />
 
-          <div className="leading-tight">
-            <p className="text-2xl font-medium text-[#000000]">John Doe</p>
-            <span className="text-sm font-medium text-[#000000]">Admin</span>
+              <div className="leading-tight">
+                <p className="text-2xl font-medium text-[#000000]">John Doe</p>
+                <span className="text-sm font-medium text-[#000000]">Admin</span>
+              </div>
+            </div>
+
+            {/* Dropdown menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                {/* Change Photo */}
+                <button
+                  onClick={() => handleDropdownAction('Change Photo')}
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                  <img src="/public/camera.svg" alt="" />
+                  Change Photo
+                </button>
+
+                {/* Change Name */}
+                <button
+                  onClick={() => handleDropdownAction('Change Name')}
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                  <img src="/public/change-name.svg" alt="" />
+                  Change Name
+                </button>
+
+                {/* Divider */}
+                <hr className="my-2 border-gray-200" />
+
+                {/* Logout */}
+                <button
+                  onClick={() => handleDropdownAction('Logout')}
+                  className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                >
+                  <img src="/public/logout.svg" alt="" />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
