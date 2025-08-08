@@ -14,6 +14,7 @@ const PhotoChange = () => {
                 </div>
                 
                 {/* Change Image Button */}
+                {/* button */}
                 <button className="bg-[#4A90E2] text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 flex items-center space-x-2">
                     <img src="/public/change-name.svg" alt="" />
                     <span>Change Image</span>
