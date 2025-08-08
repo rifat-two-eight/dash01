@@ -17,6 +17,8 @@ const Header = () => {
         return "Admin Dashboard";
       case "/terms":
         return "Terms & Conditions";
+      case "/advertising":
+        return "Advertising";
       default:
         return "";
     }
