@@ -13,6 +13,7 @@
     "@ant-design/plots": "^2.6.2",
     "@tailwindcss/vite": "^4.1.11",
     "antv": "^0.2.2",
+    "lucide-react": "^0.539.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",

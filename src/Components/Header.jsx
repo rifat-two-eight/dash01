@@ -15,6 +15,8 @@ const Header = () => {
         return "USER";
       case "/user/id":
         return "Admin Dashboard";
+      case "/terms":
+        return "Terms & Conditions";
       default:
         return "";
     }
