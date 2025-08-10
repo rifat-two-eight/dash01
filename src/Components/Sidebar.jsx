@@ -5,7 +5,7 @@ const Sidebar = () => {
   const currentPath = location.pathname;
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: "/public/square.svg" },
+    { path: "/", label: "Dashboard", icon: "/public/square.svg" },
     { path: "/user", label: "User", icon: "/public/user.svg" },
     { path: "/subscription", label: "Subscription", icon: "/public/computer-dollar.svg" },
     { path: "/advertising", label: "Advertising", icon: "/public/advertisiment.svg" },

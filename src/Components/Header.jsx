@@ -9,7 +9,7 @@ const Header = () => {
   // Map route paths to titles
   const getTitle = (path) => {
     switch (path) {
-      case "/dashboard":
+      case "/":
         return "Overview";
       case "/user":
         return "User";
