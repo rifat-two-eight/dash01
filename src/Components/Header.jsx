@@ -21,6 +21,8 @@ const Header = () => {
         return "Advertising";
       case "/subscription":
         return "Subscription";
+      case "/feedback":
+        return "Feedback";
       default:
         return "";
     }

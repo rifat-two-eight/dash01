@@ -219,7 +219,7 @@ const Subscription = () => {
             </thead>
             <tbody>
               {subscriptions.map((subscription, index) => (
-                <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="py-4 px-4 text-[#454B60]">{subscription.user}</td>
                   <td className="py-4 px-4 text-gray-600">{subscription.plan}</td>
                   <td className="py-4 px-4 text-gray-600">{subscription.date}</td>

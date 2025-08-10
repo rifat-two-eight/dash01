@@ -14,6 +14,7 @@ import SetPassword from "./Pages/SetPassword";
 import NameChange from "./Pages/NameChange";
 import PhotoChange from "./Pages/PhotoChange";
 import Terms from "./Pages/Terms";
+import Feedback from "./Pages/Feedback";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/terms",
         Component: Terms,
+      },
+      {
+        path: "/feedback",
+        Component: Feedback,
       },
     ],
   },
