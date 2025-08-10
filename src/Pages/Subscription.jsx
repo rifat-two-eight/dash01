@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const Subscription = () => {
-  const [revenueTab, setRevenueTab] = useState('Week');
-  const [subscriptionTab, setSubscriptionTab] = useState('Week');
+  const [revenueTab, setRevenueTab] = useState('Weekly');
+  const [subscriptionTab, setSubscriptionTab] = useState('Weekly');
 
   const chartData = [
     { month: 'Jan', value: 450000 },
@@ -108,7 +108,7 @@ const Subscription = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-[#454B60]">Revenue Overview</h2>
             <div className="flex space-x-1 rounded-lg">
-              {['Week', 'Monthly', 'Lifetime'].map((tab) => (
+              {['Weekly', 'Monthly', 'Lifetime'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setRevenueTab(tab)}
@@ -190,7 +190,7 @@ const Subscription = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-[#454B60]">Subscriptions List</h2>
           <div className="flex space-x-1 rounded-lg">
-            {['Week', 'Monthly', 'Lifetime'].map((tab) => (
+            {['Weekly', 'Monthly', 'Lifetime'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setSubscriptionTab(tab)}
