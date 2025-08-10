@@ -12,13 +12,15 @@ const Header = () => {
       case "/dashboard":
         return "Overview";
       case "/user":
-        return "USER";
+        return "User";
       case "/user/id":
         return "Admin Dashboard";
       case "/terms":
         return "Terms & Conditions";
       case "/advertising":
         return "Advertising";
+      case "/subscription":
+        return "Subscription";
       default:
         return "";
     }
