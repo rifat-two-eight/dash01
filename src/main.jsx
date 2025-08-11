@@ -15,6 +15,7 @@ import NameChange from "./Pages/NameChange";
 import PhotoChange from "./Pages/PhotoChange";
 import Terms from "./Pages/Terms";
 import Feedback from "./Pages/Feedback";
+import Advertising from "./Pages/Advertising";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
         path: "/feedback",
         Component: Feedback,
       },
+      {
+        path: "/advertising",
+        Component: Advertising
+      }
     ],
   },
   {
