@@ -8,10 +8,6 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = () => {
-        // Handle login logic here
-        console.log('Login submitted:', { email, password, rememberMe });
-    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -89,12 +85,11 @@ const Login = () => {
                     </div>
 
                     {/* Login Button */}
-                    <button
-                        onClick={handleSubmit}
+                    <Link to="/dashboard"><button
                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#4A90E2] cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
                     >
                         Login
-                    </button>
+                    </button></Link>
                 </div>
             </div>
         </div>

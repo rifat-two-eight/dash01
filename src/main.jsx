@@ -16,64 +16,37 @@ import PhotoChange from "./Pages/PhotoChange";
 import Terms from "./Pages/Terms";
 import Feedback from "./Pages/Feedback";
 import Advertising from "./Pages/Advertising";
-
+import Notification from "./Pages/Notification";
+import { Navigate } from "react-router";
 const router = createBrowserRouter([
+  // redirect "/" to "/login"
   {
     path: "/",
-    Component: Root,
-    errorElement: <ErrorPage></ErrorPage>,
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/dashboard",
+    element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
-      {
-        path: "/",
-        Component: Dashboard,
-      },
-      {
-        path: "/user",
-        Component: User,
-      },
-      {
-        path: "/subscription",
-        Component: Subscription,
-      },
-      {
-        path: "/user/id",
-        Component: UserDetails,
-      },
-      {
-        path: "/terms",
-        Component: Terms,
-      },
-      {
-        path: "/feedback",
-        Component: Feedback,
-      },
-      {
-        path: "/advertising",
-        Component: Advertising
-      }
+      { index: true, Component: Dashboard },
+      { path: "/dashboard/user", Component: User },
+      { path: "/dashboard/subscription", Component: Subscription },
+      { path: "/dashboard/user/:id", Component: UserDetails },
+      { path: "/dashboard/terms", Component: Terms },
+      { path: "/dashboard/feedback", Component: Feedback },
+      { path: "/dashboard/advertising", Component: Advertising },
+      { path: "/dashboard/notification", Component: Notification },
     ],
   },
-  {
-    path: "/login",
-    Component: Login,
-  },
-  {
-    path: "/forgot-password",
-    Component: Forgot,
-  },
-  {
-    path: "/set-password",
-    Component: SetPassword,
-  },
-  {
-    path: "/name-change",
-    Component: NameChange,
-  },
-  {
-    path: "/change-photo",
-    Component: PhotoChange,
-  },
+  { path: "/login", Component: Login },
+  { path: "/forgot-password", Component: Forgot },
+  { path: "/set-password", Component: SetPassword },
+  { path: "/name-change", Component: NameChange },
+  { path: "/change-photo", Component: PhotoChange },
 ]);
+
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

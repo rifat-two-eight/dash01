@@ -9,20 +9,22 @@ const Header = () => {
   // Map route paths to titles
   const getTitle = (path) => {
     switch (path) {
-      case "/":
+      case "/dashboard":
         return "Overview";
-      case "/user":
+      case "/dashboard/user":
         return "User";
-      case "/user/id":
+      case "/dashboard/user/id":
         return "Admin Dashboard";
-      case "/terms":
+      case "/dashboard/terms":
         return "Terms & Conditions";
-      case "/advertising":
+      case "/dashboard/advertising":
         return "Advertising";
-      case "/subscription":
+      case "/dashboard/subscription":
         return "Subscription";
-      case "/feedback":
+      case "/dashboard/feedback":
         return "Feedback";
+      case "/dashboard/notification":
+        return "Notifications";
       default:
         return "";
     }
@@ -62,7 +64,7 @@ const Header = () => {
 
         {/* Profile section */}
         <div className="flex items-center gap-[13px] me-[124px]">
-          <img className="me-4" src="/notification-01.svg" alt="Notification" />
+          <Link to="/dashboard/notification"><img className="me-4" src="/notification-01.svg" alt="Notification" /></Link>
 
           {/* Profile dropdown container */}
           <div className="relative" ref={dropdownRef}>
@@ -112,13 +114,13 @@ const Header = () => {
                 <hr className="my-2 border-gray-200" />
 
                 {/* Logout */}
-                <button
+                <Link to="/login"><button
                   onClick={() => handleDropdownAction("Logout")}
                   className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                 >
                   <img src="/public/logout.svg" alt="" />
                   Logout
-                </button>
+                </button></Link>
               </div>
             )}
           </div>

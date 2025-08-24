@@ -5,12 +5,12 @@ const Sidebar = () => {
   const currentPath = location.pathname;
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: "/public/square.svg" },
-    { path: "/user", label: "User", icon: "/public/user.svg" },
-    { path: "/subscription", label: "Subscription", icon: "/public/computer-dollar.svg" },
-    { path: "/advertising", label: "Advertising", icon: "/public/advertisiment.svg" },
-    { path: "/feedback", label: "Feedback", icon: "/public/Group 4.svg" },
-    { path: "/terms", label: "Terms & Conditions", icon: "/public/shield-01.svg" },
+    { path: "/dashboard", label: "Dashboard", icon: "/public/square.svg" },
+    { path: "/dashboard/user", label: "User", icon: "/public/user.svg" },
+    { path: "/dashboard/subscription", label: "Subscription", icon: "/public/computer-dollar.svg" },
+    { path: "/dashboard/advertising", label: "Advertising", icon: "/public/advertisiment.svg" },
+    { path: "/dashboard/feedback", label: "Feedback", icon: "/public/Group 4.svg" },
+    { path: "/dashboard/terms", label: "Terms & Conditions", icon: "/public/shield-01.svg" },
   ];
 
   return (
