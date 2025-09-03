@@ -1,20 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Map route paths to titles
   const getTitle = (path) => {
+    // Handle dynamic user/:id route
+    if (path.startsWith("/dashboard/user/")) {
+      return "Admin Dashboard";
+    }
     switch (path) {
       case "/dashboard":
         return "Overview";
       case "/dashboard/user":
         return "User";
-      case "/dashboard/user/id":
-        return "Admin Dashboard";
       case "/dashboard/terms":
         return "Terms & Conditions";
       case "/dashboard/advertising":
@@ -50,10 +53,17 @@ const Header = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleDropdownAction = (action) => {
-    console.log(`${action} clicked`);
+  // Handle logout
+  const handleLogout = () => {
+    // Clear token and other stored data from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("rememberEmail");
+    localStorage.removeItem("rememberPassword");
+    localStorage.removeItem("rememberMe");
+    
+    // Close dropdown and redirect to login
     setIsDropdownOpen(false);
-    // Add your action handlers here
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -64,7 +74,9 @@ const Header = () => {
 
         {/* Profile section */}
         <div className="flex items-center gap-[13px] me-[124px]">
-          <Link to="/dashboard/notification"><img className="me-4" src="/notification-01.svg" alt="Notification" /></Link>
+          <Link to="/dashboard/notification">
+            <img className="me-4" src="/notification-01.svg" alt="Notification" />
+          </Link>
 
           {/* Profile dropdown container */}
           <div className="relative" ref={dropdownRef}>
@@ -91,18 +103,18 @@ const Header = () => {
             {isDropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                 {/* Change Photo */}
-                <Link to="/change-photo"><button
-                  onClick={() => handleDropdownAction("Change Photo")}
-                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                >
-                  <img src="/public/camera.svg" alt="" />
-                  Change Photo
-                </button></Link>
+                <Link to="/change-photo">
+                  <button
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                  >
+                    <img src="/public/camera.svg" alt="" />
+                    Change Photo
+                  </button>
+                </Link>
 
                 {/* Change Name */}
                 <Link to="/name-change">
                   <button
-                    onClick={() => handleDropdownAction("Change Name")}
                     className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                   >
                     <img src="/public/change-name.svg" alt="" />
@@ -114,13 +126,13 @@ const Header = () => {
                 <hr className="my-2 border-gray-200" />
 
                 {/* Logout */}
-                <Link to="/login"><button
-                  onClick={() => handleDropdownAction("Logout")}
+                <button
+                  onClick={handleLogout}
                   className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                 >
                   <img src="/public/logout.svg" alt="" />
                   Logout
-                </button></Link>
+                </button>
               </div>
             )}
           </div>

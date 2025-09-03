@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import Root from "./Layout/Root";
 import Dashboard from "./Pages/Dashboard";
 import User from "./Pages/User";
@@ -17,36 +17,70 @@ import Terms from "./Pages/Terms";
 import Feedback from "./Pages/Feedback";
 import Advertising from "./Pages/Advertising";
 import Notification from "./Pages/Notification";
-import { Navigate } from "react-router";
+import SetPasswordRoute from "./Pages/SetPasswordRoute";
+import PrivateRoute from "./Pages/PrivateRoute";
+
+
 const router = createBrowserRouter([
-  // redirect "/" to "/login"
+  // Public routes
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/forgot-password",
+    element: <Forgot />,
+  },
+  // Private route for set-password (requires reset token from navigation state)
+  {
+    path: "/set-password",
+    element: (
+      <SetPasswordRoute>
+        <SetPassword />
+      </SetPasswordRoute>
+    ),
+  },
+  // Private routes requiring authentication token
   {
     path: "/",
     element: <Navigate to="/login" replace />,
   },
   {
     path: "/dashboard",
-    element: <Root />,
+    element: (
+      <PrivateRoute>
+        <Root />
+      </PrivateRoute>
+    ),
     errorElement: <ErrorPage />,
     children: [
-      { index: true, Component: Dashboard },
-      { path: "/dashboard/user", Component: User },
-      { path: "/dashboard/subscription", Component: Subscription },
-      { path: "/dashboard/user/:id", Component: UserDetails },
-      { path: "/dashboard/terms", Component: Terms },
-      { path: "/dashboard/feedback", Component: Feedback },
-      { path: "/dashboard/advertising", Component: Advertising },
-      { path: "/dashboard/notification", Component: Notification },
+      { index: true, element: <Dashboard /> },
+      { path: "user", element: <User /> },
+      { path: "subscription", element: <Subscription /> },
+      { path: "user/:id", element: <UserDetails /> },
+      { path: "terms", element: <Terms /> },
+      { path: "feedback", element: <Feedback /> },
+      { path: "advertising", element: <Advertising /> },
+      { path: "notification", element: <Notification /> },
     ],
   },
-  { path: "/login", Component: Login },
-  { path: "/forgot-password", Component: Forgot },
-  { path: "/set-password", Component: SetPassword },
-  { path: "/name-change", Component: NameChange },
-  { path: "/change-photo", Component: PhotoChange },
+  {
+    path: "/name-change",
+    element: (
+      <PrivateRoute>
+        <NameChange />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/change-photo",
+    element: (
+      <PrivateRoute>
+        <PhotoChange />
+      </PrivateRoute>
+    ),
+  },
 ]);
-
-
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

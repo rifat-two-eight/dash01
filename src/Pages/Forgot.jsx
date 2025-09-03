@@ -47,6 +47,7 @@ const Forgot = () => {
         }, 1000);
       }
     } catch (err) {
+      console.error("Send OTP error:", err.response?.data || err.message);
       setMessage(err.response?.data?.message || "User not found");
       setError(true);
     } finally {
@@ -90,6 +91,7 @@ const Forgot = () => {
         }, 1000);
       }
     } catch (err) {
+      console.error("Resend OTP error:", err.response?.data || err.message);
       setMessage(err.response?.data?.message || "User not found");
       setError(true);
     } finally {
@@ -97,7 +99,7 @@ const Forgot = () => {
     }
   };
 
-  // Verify OTP - Simple implementation
+  // Verify OTP - Enhanced with better debugging
   const handleVerifyOtp = async () => {
     if (!otp) {
       setMessage("Please enter the OTP");
@@ -105,24 +107,68 @@ const Forgot = () => {
       return;
     }
 
+    // Clear previous messages
+    setMessage("");
+    setError(false);
     setLoading(true);
+
     try {
+      console.log("Verifying OTP for email:", email, "OTP:", otp);
+      
       const response = await axios.post("http://10.10.7.106:5000/api/v1/auth/verify-email", {
         email: email,
         oneTimeCode: parseInt(otp)
       });
 
+      console.log("Verify OTP Response:", response.data);
+
       if (response.data.success) {
-        navigate("/set-password", {
-          state: { email, token: response.data.data },
-        });
+        // Extract the token - check different possible locations
+        const token = response.data.data || response.data.token || response.data.accessToken;
+        
+        console.log("Token extracted:", token);
+        
+        if (!token) {
+          setMessage("Token not received from server. Please try again.");
+          setError(true);
+          return;
+        }
+
+        setMessage("OTP verified successfully! Redirecting...");
+        setError(false);
+        
+        // Navigate with token and OTP
+        setTimeout(() => {
+          navigate("/set-password", {
+            state: { 
+              email, 
+              token: token,
+              otp: otp // Pass the OTP as well
+            },
+          });
+        }, 1000);
+      } else {
+        setMessage(response.data.message || "Verification failed");
+        setError(true);
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || error.response?.data?.errorMessages?.[0]?.message || "Invalid OTP");
+      console.error("Verify OTP error:", error.response?.data || error.message);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errorMessages?.[0]?.message || 
+                          "Invalid OTP or verification failed";
+      
+      setMessage(errorMessage);
       setError(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -151,13 +197,14 @@ const Forgot = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="example@gmail.com"
                 disabled={loading}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendOtp()}
               />
             </div>
 
             {message && (
-              <p className={`text-sm ${error ? "text-red-500" : "text-green-500"}`}>
+              <div className={`p-3 rounded-md ${error ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}>
                 {message}
-              </p>
+              </div>
             )}
 
             <button
@@ -188,13 +235,15 @@ const Forgot = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter OTP"
                 disabled={loading}
+                maxLength="6"
+                onKeyPress={(e) => e.key === 'Enter' && handleVerifyOtp()}
               />
             </div>
 
             {message && (
-              <p className={`text-sm ${error ? "text-red-500" : "text-green-500"}`}>
+              <div className={`p-3 rounded-md ${error ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}>
                 {message}
-              </p>
+              </div>
             )}
 
             <div className="flex justify-between items-center">
@@ -212,7 +261,7 @@ const Forgot = () => {
                 className="flex-1 ml-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white cursor-pointer hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Resending..." : 
-                 resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 
+                 resendCooldown > 0 ? `Resend in ${formatTime(resendCooldown)}` : 
                  "Resend OTP"}
               </button>
             </div>
@@ -228,6 +277,7 @@ const Forgot = () => {
                   setResendCooldown(0);
                 }}
                 className="text-sm text-blue-600 hover:text-blue-800 underline"
+                disabled={loading}
               >
                 Change email address
               </button>

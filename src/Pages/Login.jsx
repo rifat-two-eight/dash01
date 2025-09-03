@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import axios from "axios";
 
 const Login = () => {
@@ -12,6 +12,20 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Load saved email and password from localStorage on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberEmail");
+    const savedPassword = localStorage.getItem("rememberPassword");
+    const savedRememberMe = localStorage.getItem("rememberMe") === "true";
+
+    if (savedEmail && savedPassword && savedRememberMe) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = async () => {
     setError("");
@@ -26,22 +40,29 @@ const Login = () => {
         // Save token to localStorage
         localStorage.setItem("token", res.data.data);
 
-        // Optionally store rememberMe
+        // Store email and password if rememberMe is checked
         if (rememberMe) {
           localStorage.setItem("rememberEmail", email);
+          localStorage.setItem("rememberPassword", password);
+          localStorage.setItem("rememberMe", "true");
         } else {
+          // Clear stored credentials if rememberMe is unchecked
           localStorage.removeItem("rememberEmail");
+          localStorage.removeItem("rememberPassword");
+          localStorage.removeItem("rememberMe");
         }
 
-        // Redirect to dashboard
-        navigate("/dashboard");
+        // Redirect to the intended page or default to dashboard
+        const from = location.state?.from || "/dashboard";
+        navigate(from, { replace: true });
       } else {
         setError(res.data.message || "Login failed");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -70,6 +91,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="example@gmail.com"
+              disabled={loading}
             />
           </div>
 
@@ -89,11 +111,14 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 pr-10"
                 placeholder="********"
+                disabled={loading}
+                onKeyPress={(e) => e.key === "Enter" && handleLogin()}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 transition-colors"
+                disabled={loading}
               >
                 {showPassword ? (
                   <AiOutlineEyeInvisible className="w-5 h-5 text-gray-400" />
@@ -113,12 +138,13 @@ const Login = () => {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-400 rounded"
+                disabled={loading}
               />
               <label
                 htmlFor="remember-me"
                 className="ml-2 block text-sm text-gray-400"
               >
-                Remember Password
+                Remember Me
               </label>
             </div>
             <div className="text-sm">
@@ -137,8 +163,8 @@ const Login = () => {
           {/* Login Button */}
           <button
             onClick={handleLogin}
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#4A90E2] cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 disabled:opacity-50"
+            disabled={loading || !email || !password}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#4A90E2] cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
