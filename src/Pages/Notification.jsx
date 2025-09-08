@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const Notification = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [readNotifications, setReadNotifications] = useState([1, 2]); // First 2 are read initially
+    const [readNotifications, setReadNotifications] = useState([1, 2]); 
 
     const notifications = [
         {

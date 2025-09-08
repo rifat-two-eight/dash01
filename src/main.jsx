@@ -6,7 +6,6 @@ import Root from "./Layout/Root";
 import Dashboard from "./Pages/Dashboard";
 import User from "./Pages/User";
 import Subscription from "./Pages/Subscription";
-import UserDetails from "./Pages/UserDetails";
 import ErrorPage from "./Pages/ErrorPage";
 import Login from "./Pages/Login";
 import Forgot from "./Pages/Forgot";
@@ -19,7 +18,7 @@ import Advertising from "./Pages/Advertising";
 import Notification from "./Pages/Notification";
 import SetPasswordRoute from "./Pages/SetPasswordRoute";
 import PrivateRoute from "./Pages/PrivateRoute";
-
+import UserDetails from "./Pages/UserDetails";
 
 const router = createBrowserRouter([
   // Public routes
@@ -31,7 +30,6 @@ const router = createBrowserRouter([
     path: "/forgot-password",
     element: <Forgot />,
   },
-  // Private route for set-password (requires reset token from navigation state)
   {
     path: "/set-password",
     element: (
@@ -40,11 +38,14 @@ const router = createBrowserRouter([
       </SetPasswordRoute>
     ),
   },
-  // Private routes requiring authentication token
+
+  // Redirect root to login
   {
     path: "/",
     element: <Navigate to="/login" replace />,
   },
+
+  // Private routes
   {
     path: "/dashboard",
     element: (
@@ -56,14 +57,15 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "user", element: <User /> },
+      { path: "user/:id", element: <UserDetails /> }, // ✅ works now as /dashboard/user/:id
       { path: "subscription", element: <Subscription /> },
-      { path: "user/:id", element: <UserDetails /> },
       { path: "terms", element: <Terms /> },
       { path: "feedback", element: <Feedback /> },
       { path: "advertising", element: <Advertising /> },
       { path: "notification", element: <Notification /> },
     ],
   },
+
   {
     path: "/name-change",
     element: (

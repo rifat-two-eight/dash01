@@ -1,162 +1,287 @@
-import React, { useState } from 'react';
-import { FaUser, FaEllipsisV, FaChevronDown } from 'react-icons/fa';
-import { FaRegEye } from "react-icons/fa";
-import { Link } from 'react-router';
-
+import React, { useState, useEffect } from "react";
+import { FaUser, FaEllipsisV, FaChevronDown, FaRegEye } from "react-icons/fa";
+import { Link } from "react-router";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const User = () => {
-    const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [metrics, setMetrics] = useState({
+    totalUsers: 0,
+    proUsers: 0,
+    freeUsers: 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("");
+  const [accountType, setAccountType] = useState("");
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const baseURL = "http://10.10.7.106:5000/api/v1";
 
-    const userData = [
-        { name: "John Doe", email: "john@example.com", accountType: "Pro", registrationDate: "2024-01-15", id: 1 },
-        { name: "Jane Smith", email: "jane@example.com", accountType: "Free", registrationDate: "2024-01-20", id: 2 },
-        { name: "Mike Johnson", email: "mike@example.com", accountType: "Pro", registrationDate: "2024-02-01", id: 3 },
-        { name: "Sarah Wilson", email: "sarah@example.com", accountType: "Free", registrationDate: "2024-02-10", id: 4 },
-        { name: "David Brown", email: "david@example.com", accountType: "Pro", registrationDate: "2024-02-15", id: 5 },
-        { name: "John Doe", email: "john@example.com", accountType: "Pro", registrationDate: "2024-01-15", id: 6 },
-        { name: "Jane Smith", email: "jane@example.com", accountType: "Free", registrationDate: "2024-01-20", id: 7 },
-    ];
+  // Fetch users and their details
+  const fetchUserData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch user list
+      const listRes = await axios.get(`${baseURL}/user/admin/user-list`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 15000,
+      });
 
-    const toggleDropdown = (id) => {
-        setDropdownOpen(dropdownOpen === id ? null : id);
-    };
+      if (!listRes.data.success) {
+        throw new Error(listRes.data.message || "Failed to load users");
+      }
 
-    return (
-        <div className='space-y-6 ms-16'>
-            {/* 3 Stats Cards Grid */}
-            <div className="grid grid-cols-10 gap-6">
-                {/* 1st Card - Total Users (bigger) */}
-                <div className="col-span-4 bg-white px-2 py-4 rounded-xl shadow-sm">
-                    <div className="flex items-start justify-between">
-                        {/* Left side - User icon with blue round bg */}
-                        <div className="bg-[#4383CE] p-3 rounded-full">
-                            <FaUser className="text-white text-xl" />
-                        </div>
-                        {/* Right side - Total Users text and number */}
-                        <div className="text-right">
-                            <p className="text-2xl">Total User</p>
-                            <p className="text-2xl mt-3 font-medium text-gray-800">24,582</p>
-                        </div>
-                    </div>
-                </div>
+      const users = listRes.data.data || [];
+      // Fetch createdAt for each user
+      const userDetails = await Promise.all(
+        users.map((user) =>
+          axios
+            .get(`${baseURL}/user/admin/user/${user.userId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+              timeout: 15000,
+            })
+            .then((res) => ({
+              ...user,
+              createdAt: res.data.success ? res.data.data.createdAt : null,
+            }))
+            .catch((err) => {
+              console.error(`Error fetching details for user ${user.userId}:`, err);
+              return { ...user, createdAt: null };
+            })
+        )
+      );
 
-                {/* 2nd Card - Pro Users (same size as 3rd) */}
-                <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
-                    <div className="flex items-start justify-between">
-                        {/* Left side - User icon with blue round bg */}
-                        <div className="bg-[#4383CE] p-3 rounded-full">
-                            <FaUser className="text-white text-xl" />
-                        </div>
-                        {/* Right side - Total Users text and number */}
-                        <div className="text-right">
-                            <p className="text-2xl">Pro User</p>
-                            <p className="text-2xl mt-3 font-medium text-gray-800">4,342</p>
-                        </div>
-                    </div>
-                </div>
+      setUsers(userDetails);
+      // Derive metrics
+      setMetrics({
+        totalUsers: userDetails.length,
+        proUsers: userDetails.filter((u) => u.userType === "pro").length,
+        freeUsers: userDetails.filter((u) => u.userType === "free").length,
+      });
+    } catch (err) {
+      console.error("Error fetching user data:", err.response?.data || err);
+      const errorMessage =
+        err.code === "ECONNABORTED"
+          ? "Request timed out. Please check if the server is running at 10.10.7.106:5000."
+          : err.response?.status === 401 || err.response?.data?.message?.includes("Session Expired")
+          ? "Session expired. Please log in again."
+          : err.response?.status === 403
+          ? "Access denied: Admin or Super Admin privileges required. Try logging in with shakayet.dev@gmail.com."
+          : err.response?.status === 404 || err.response?.data?.message?.includes("Not found")
+          ? "No user data found. Please check the backend API."
+          : err.response?.data?.message || "Failed to load user data.";
+      setError(errorMessage);
+      Swal.fire("Error!", errorMessage, "error");
+      if (err.response?.status === 401 || err.response?.data?.message?.includes("Session Expired")) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      } else if (err.response?.status === 403) {
+        navigate("/login");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* 3rd Card - Free Users (same size as 2nd) */}
-                <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
-                    <div className="flex items-start justify-between">
-                        {/* Left side - User icon with blue round bg */}
-                        <div className="bg-[#4383CE] p-3 rounded-full">
-                            <FaUser className="text-white text-xl" />
-                        </div>
-                        {/* Right side - Total Users text and number */}
-                        <div className="text-right">
-                            <p className="text-2xl">Free User</p>
-                            <p className="text-2xl mt-3 font-medium text-gray-800">12,423</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  // Fetch data on mount
+  useEffect(() => {
+    if (token) fetchUserData();
+    else {
+      setError("No authentication token found. Please log in.");
+      Swal.fire("Error!", "No authentication token found. Please log in.", "error");
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
-            {/* Table Section */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-                {/* 3 Dropdowns above table */}
-                <div className="flex gap-4 mb-6">
-                    {/* Filter Dropdown */}
-                    <div className="relative">
-                        <select className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md appearance-none pr-8 cursor-pointer focus:outline-none focus:border-blue-500">
-                            <option>Filter</option>
-                            <option>Name A-Z</option>
-                            <option>Name Z-A</option>
-                            <option>Recent</option>
-                            <option>Oldest</option>
-                        </select>
-                        <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
-                    </div>
+  // Toggle dropdown
+  const toggleDropdown = (id) => {
+    setDropdownOpen(dropdownOpen === id ? null : id);
+  };
 
-                
+  // Filter and sort users
+  const filteredUsers = users
+    .filter((user) => (accountType ? user.userType === accountType : true))
+    .sort((a, b) => {
+      if (filter === "Name A-Z") return a.name.localeCompare(b.name);
+      if (filter === "Name Z-A") return b.name.localeCompare(a.name);
+      if (filter === "Recent") return new Date(b.createdAt || "2025-01-01") - new Date(a.createdAt || "2025-01-01");
+      if (filter === "Oldest") return new Date(a.createdAt || "2025-01-01") - new Date(b.createdAt || "2025-01-01");
+      return 0;
+    });
 
-                    {/* All Account Type Dropdown */}
-                    <div className="relative">
-                        <select className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md appearance-none pr-8 cursor-pointer focus:outline-none focus:border-blue-500">
-                            <option>All Account Type</option>
-                            <option>Pro</option>
-                            <option>Free</option>
-                        </select>
-                        <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
-                    </div>
-                </div>
-
-                {/* Users Table */}
-                <div className="overflow-x-auto border border-gray-200 rounded-sm">
-                    <table className="w-full">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Name</th>
-                                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Email</th>
-                                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Account Type</th>
-                                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Registration Date</th>
-                                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {userData.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                    <td className="py-4 px-4 text-gray-800">{user.name}</td>
-                                    <td className="py-4 px-4 text-gray-600">{user.email}</td>
-                                    <td className="py-4 px-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            user.accountType === 'Pro' 
-                                                ? 'bg-blue-100 text-[#4383CE]' 
-                                                : 'bg-gray-100 text-gray-800'
-                                        }`}>
-                                            {user.accountType}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-4 text-gray-600">{user.registrationDate}</td>
-                                    <td className="py-4 px-4">
-                                        <div className="relative">
-                                            <button 
-                                                onClick={() => toggleDropdown(user.id)}
-                                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                                            >
-                                                <FaEllipsisV className="text-gray-500" />
-                                            </button>
-                                            
-                                            {/* Dropdown Menu */}
-                                            {dropdownOpen === user.id && (
-                                                <div className="absolute right-0 bottom-10 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-[120px]">
-                                                    <button 
-                                                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
-                                                        
-                                                    >
-                                                       <Link to={`/user/id`}><div className='flex items-center gap-3'><FaRegEye></FaRegEye> View Profile</div></Link>
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  return (
+    <div className="space-y-6 ms-16">
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-3">
+          <AlertCircle className="w-5 h-5 text-red-600" />
+          <span className="text-red-800 text-sm">{error}</span>
+          <button
+            onClick={fetchUserData}
+            className="ml-4 px-3 py-1 text-sm font-medium text-white bg-[#4383CE] rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-[#4383CE]"
+            disabled={loading}
+          >
+            Retry
+          </button>
         </div>
-    );
+      )}
+
+      {/* 3 Stats Cards Grid */}
+      {loading ? (
+        <div className="text-center py-10 text-gray-600">Loading...</div>
+      ) : (
+        <div className="grid grid-cols-10 gap-6">
+          {/* Total Users */}
+          <div className="col-span-4 bg-white px-2 py-4 rounded-xl shadow-sm">
+            <div className="flex items-start justify-between">
+              <div className="bg-[#4383CE] p-3 rounded-full">
+                <FaUser className="text-white text-xl" />
+              </div>
+              <div className="text-right">
+                <p className="text-2xl">Total User</p>
+                <p className="text-2xl mt-3 font-medium text-gray-800">{metrics.totalUsers}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pro Users */}
+          <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
+            <div className="flex items-start justify-between">
+              <div className="bg-[#4383CE] p-3 rounded-full">
+                <FaUser className="text-white text-xl" />
+              </div>
+              <div className="text-right">
+                <p className="text-2xl">Pro User</p>
+                <p className="text-2xl mt-3 font-medium text-gray-800">{metrics.proUsers}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Free Users */}
+          <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
+            <div className="flex items-start justify-between">
+              <div className="bg-[#4383CE] p-3 rounded-full">
+                <FaUser className="text-white text-xl" />
+              </div>
+              <div className="text-right">
+                <p className="text-2xl">Free User</p>
+                <p className="text-2xl mt-3 font-medium text-gray-800">{metrics.freeUsers}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table Section */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        {/* Dropdowns above table */}
+        <div className="flex gap-4 mb-6">
+          {/* Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md appearance-none pr-8 cursor-pointer focus:outline-none focus:border-blue-500"
+              disabled={loading}
+            >
+              <option value="">Filter</option>
+              <option value="Name A-Z">Name A-Z</option>
+              <option value="Name Z-A">Name Z-A</option>
+              <option value="Recent">Recent</option>
+              <option value="Oldest">Oldest</option>
+            </select>
+            <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
+          </div>
+
+          {/* All Account Type Dropdown */}
+          <div className="relative">
+            <select
+              value={accountType}
+              onChange={(e) => setAccountType(e.target.value)}
+              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md appearance-none pr-8 cursor-pointer focus:outline-none focus:border-blue-500"
+              disabled={loading}
+            >
+              <option value="">All Account Type</option>
+              <option value="pro">Pro</option>
+              <option value="free">Free</option>
+            </select>
+            <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Users Table */}
+        <div className="overflow-x-auto border border-gray-200 rounded-sm">
+          <table className="w-full">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Name</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Email</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Account Type</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Registration Date</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user.userId} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="py-4 px-4 text-gray-800">{user.name}</td>
+                    <td className="py-4 px-4 text-gray-600">{user.email}</td>
+                    <td className="py-4 px-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          user.userType === "pro" ? "bg-blue-100 text-[#4383CE]" : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-gray-600">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US") : "N/A"}
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="relative">
+                        <button
+                          onClick={() => toggleDropdown(user.userId)}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                          disabled={loading}
+                        >
+                          <FaEllipsisV className="text-gray-500" />
+                        </button>
+                        {dropdownOpen === user.userId && (
+                          <div className="absolute right-0 bottom-10 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-[120px]">
+                            <Link to={`/dashboard/user/${user.userId}`}>
+                              <button className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">
+                                <div className="flex items-center gap-3">
+                                  <FaRegEye /> View Details
+                                </div>
+                              </button>
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="py-4 px-4 text-gray-600 text-center">
+                    No users available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default User;
