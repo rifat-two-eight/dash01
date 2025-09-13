@@ -15,7 +15,6 @@ import PhotoChange from "./Pages/PhotoChange";
 import Terms from "./Pages/Terms";
 import Feedback from "./Pages/Feedback";
 import Advertising from "./Pages/Advertising";
-import Notification from "./Pages/Notification";
 import SetPasswordRoute from "./Pages/SetPasswordRoute";
 import PrivateRoute from "./Pages/PrivateRoute";
 import UserDetails from "./Pages/UserDetails";
@@ -45,7 +44,7 @@ const router = createBrowserRouter([
     element: <Navigate to="/login" replace />,
   },
 
-  // Private routes
+  // Private routes 
   {
     path: "/dashboard",
     element: (
@@ -57,12 +56,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "user", element: <User /> },
-      { path: "user/:id", element: <UserDetails /> }, // ✅ works now as /dashboard/user/:id
+      { path: "user/:id", element: <UserDetails /> },
       { path: "subscription", element: <Subscription /> },
       { path: "terms", element: <Terms /> },
       { path: "feedback", element: <Feedback /> },
       { path: "advertising", element: <Advertising /> },
-      { path: "notification", element: <Notification /> },
     ],
   },
 

@@ -22,7 +22,7 @@ const Feedback = () => {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const baseURL = "http://10.10.7.106:5000/api/v1";
-  const defaultImage = "https://i.postimg.cc/3xBtfyJ5/Ellipse-1.png";
+  const defaultImage = "https://cdn-icons-png.freepik.com/512/18/18148.png";
   const initialPageSize = 3;
   const pageSizeIncrement = 5;
 
