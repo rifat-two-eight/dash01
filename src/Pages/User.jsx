@@ -33,36 +33,50 @@ const User = () => {
         timeout: 15000,
       });
 
+      console.log("User list response:", listRes.data); // Debug log
+
       if (!listRes.data.success) {
         throw new Error(listRes.data.message || "Failed to load users");
       }
 
       const users = listRes.data.data || [];
-      // Fetch createdAt for each user
+      // Fetch details for each user
       const userDetails = await Promise.all(
-        users.map((user) =>
-          axios
-            .get(`${baseURL}/user/admin/user/${user.userId}`, {
+        users.map((user) => {
+          const userId = user._id || user.userId; // Handle _id or userId
+          if (!userId) {
+            console.warn("User missing ID:", user);
+            return { ...user, userId: "unknown", createdAt: null, name: user.name || "Unknown", email: user.email || "N/A" };
+          }
+          return axios
+            .get(`${baseURL}/user/admin/user/${userId}`, {
               headers: { Authorization: `Bearer ${token}` },
               timeout: 15000,
             })
-            .then((res) => ({
-              ...user,
-              createdAt: res.data.success ? res.data.data.createdAt : null,
-            }))
-            .catch((err) => {
-              console.error(`Error fetching details for user ${user.userId}:`, err);
-              return { ...user, createdAt: null };
+            .then((res) => {
+              console.log(`User ${userId} details response:`, res.data); // Debug log
+              return {
+                ...user,
+                userId,
+                createdAt: res.data.success ? res.data.data.createdAt : null,
+                name: res.data.success ? res.data.data.name : user.name || "Unknown",
+                email: res.data.success ? res.data.data.email : user.email || "N/A",
+                userType: res.data.success ? res.data.data.plan || user.userType : user.userType || "free",
+              };
             })
-        )
+            .catch((err) => {
+              console.error(`Error fetching details for user ${userId}:`, err.response?.data || err);
+              return { ...user, userId, createdAt: null, name: user.name || "Unknown", email: user.email || "N/A" };
+            });
+        })
       );
 
       setUsers(userDetails);
       // Derive metrics
       setMetrics({
         totalUsers: userDetails.length,
-        proUsers: userDetails.filter((u) => u.userType === "pro").length,
-        freeUsers: userDetails.filter((u) => u.userType === "free").length,
+        proUsers: userDetails.filter((u) => (u.userType || u.plan) === "pro").length,
+        freeUsers: userDetails.filter((u) => (u.userType || u.plan) === "free").length,
       });
     } catch (err) {
       console.error("Error fetching user data:", err.response?.data || err);
@@ -101,15 +115,19 @@ const User = () => {
 
   // Toggle dropdown
   const toggleDropdown = (id) => {
+    if (!id || id === "unknown") {
+      console.warn("Attempted to toggle dropdown with invalid userId");
+      return;
+    }
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
   // Filter and sort users
   const filteredUsers = users
-    .filter((user) => (accountType ? user.userType === accountType : true))
+    .filter((user) => (accountType ? (user.userType || user.plan) === accountType : true))
     .sort((a, b) => {
-      if (filter === "Name A-Z") return a.name.localeCompare(b.name);
-      if (filter === "Name Z-A") return b.name.localeCompare(a.name);
+      if (filter === "Name A-Z") return (a.name || "").localeCompare(b.name || "");
+      if (filter === "Name Z-A") return (b.name || "").localeCompare(a.name || "");
       if (filter === "Recent") return new Date(b.createdAt || "2025-01-01") - new Date(a.createdAt || "2025-01-01");
       if (filter === "Oldest") return new Date(a.createdAt || "2025-01-01") - new Date(b.createdAt || "2025-01-01");
       return 0;
@@ -132,12 +150,11 @@ const User = () => {
         </div>
       )}
 
-      {/* 3 Stats Cards Grid */}
+      {/* Stats Cards Grid */}
       {loading ? (
         <div className="text-center py-10 text-gray-600">Loading...</div>
       ) : (
         <div className="grid grid-cols-10 gap-6">
-          {/* Total Users */}
           <div className="col-span-4 bg-white px-2 py-4 rounded-xl shadow-sm">
             <div className="flex items-start justify-between">
               <div className="bg-[#4383CE] p-3 rounded-full">
@@ -149,8 +166,6 @@ const User = () => {
               </div>
             </div>
           </div>
-
-          {/* Pro Users */}
           <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
             <div className="flex items-start justify-between">
               <div className="bg-[#4383CE] p-3 rounded-full">
@@ -162,8 +177,6 @@ const User = () => {
               </div>
             </div>
           </div>
-
-          {/* Free Users */}
           <div className="col-span-3 bg-white px-2 py-4 rounded-xl shadow-sm">
             <div className="flex items-start justify-between">
               <div className="bg-[#4383CE] p-3 rounded-full">
@@ -180,9 +193,7 @@ const User = () => {
 
       {/* Table Section */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        {/* Dropdowns above table */}
         <div className="flex gap-4 mb-6">
-          {/* Filter Dropdown */}
           <div className="relative">
             <select
               value={filter}
@@ -198,8 +209,6 @@ const User = () => {
             </select>
             <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
           </div>
-
-          {/* All Account Type Dropdown */}
           <div className="relative">
             <select
               value={accountType}
@@ -214,8 +223,6 @@ const User = () => {
             <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none" />
           </div>
         </div>
-
-        {/* Users Table */}
         <div className="overflow-x-auto border border-gray-200 rounded-sm">
           <table className="w-full">
             <thead className="bg-gray-100">
@@ -231,15 +238,15 @@ const User = () => {
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.userId} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="py-4 px-4 text-gray-800">{user.name}</td>
-                    <td className="py-4 px-4 text-gray-600">{user.email}</td>
+                    <td className="py-4 px-4 text-gray-800">{user.name || "Unknown"}</td>
+                    <td className="py-4 px-4 text-gray-600">{user.email || "N/A"}</td>
                     <td className="py-4 px-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          user.userType === "pro" ? "bg-blue-100 text-[#4383CE]" : "bg-gray-100 text-gray-800"
+                          (user.userType || user.plan) === "pro" ? "bg-blue-100 text-[#4383CE]" : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}
+                        {(user.userType || user.plan || "free").charAt(0).toUpperCase() + (user.userType || user.plan || "free").slice(1)}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-gray-600">
@@ -250,7 +257,7 @@ const User = () => {
                         <button
                           onClick={() => toggleDropdown(user.userId)}
                           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                          disabled={loading}
+                          disabled={loading || !user.userId || user.userId === "unknown"}
                         >
                           <FaEllipsisV className="text-gray-500" />
                         </button>
