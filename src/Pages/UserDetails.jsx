@@ -206,7 +206,7 @@ const UserDetails = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-lg font-medium">User Name</label>
-                <p className="text-sm font-semibold">{userData.name}</p>
+                <p className="text-lg font-semibold">{userData.name}</p>
               </div>
               <div>
                 <label className="text-lg font-medium">User ID</label>
