@@ -15,6 +15,7 @@ const UserDetails = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const baseURL = "http://10.10.7.106:5000/api/v1";
@@ -98,8 +99,8 @@ const UserDetails = () => {
             email: data.email || "N/A",
             image: data.image ? `http://10.10.7.106:5000${data.image}` : null,
             createdAt: data.createdAt ? new Date(data.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
-            plan: data.plan || data.userType || "free",
-            status: data.status || "active",
+            plan: data.userType || data.plan || "free",
+            status: data.accountStatus || data.status || "active",
           });
         } else {
           throw new Error(res.data.message || "Failed to load user data");
@@ -131,6 +132,119 @@ const UserDetails = () => {
 
     fetchUserData();
   }, [id, token, navigate]);
+
+  // Update user status or plan
+  const updateUser = async (updateData) => {
+    setActionLoading(true);
+    try {
+      const res = await axios.patch(`${baseURL}/user/admin/user/${id}`, updateData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000,
+      });
+
+      if (res.data.success) {
+        // Update local state with correct field mapping
+        const mappedData = {};
+        if (updateData.accountStatus) {
+          mappedData.status = updateData.accountStatus;
+        }
+        if (updateData.userType) {
+          mappedData.plan = updateData.userType;
+        }
+        
+        setUserData(prevState => ({
+          ...prevState,
+          ...mappedData
+        }));
+        
+        // Notify other components that user data has been updated
+        window.dispatchEvent(new CustomEvent('userDataUpdated', { 
+          detail: { userId: id, updateData } 
+        }));
+        
+        // Store flags in localStorage to trigger refresh
+        localStorage.setItem('userListNeedsRefresh', 'true');
+        localStorage.setItem('lastUserUpdate', Date.now().toString());
+        
+        Swal.fire("Success!", "User updated successfully!", "success");
+      } else {
+        throw new Error(res.data.message || "Failed to update user");
+      }
+    } catch (err) {
+      console.error("Error updating user:", err.response?.data || err);
+      const errorMessage =
+        err.code === "ECONNABORTED"
+          ? "Request timed out. Please try again."
+          : err.response?.status === 401 || err.response?.data?.message?.includes("Session Expired")
+          ? "Session expired. Please log in again."
+          : err.response?.status === 403
+          ? "Access denied: Admin or Super Admin privileges required."
+          : err.response?.status === 404
+          ? "User not found."
+          : err.response?.data?.message || "Failed to update user.";
+      
+      Swal.fire("Error!", errorMessage, "error");
+      
+      if (err.response?.status === 401 || err.response?.data?.message?.includes("Session Expired")) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Admin action handlers
+  const handleUnblockUser = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will set the user status to active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#00A62C",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, unblock user!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        updateUser({ accountStatus: "active" });
+      }
+    });
+  };
+
+  const handleAssignAsPro = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will upgrade the user to Pro plan.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#4A90E2",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, assign as Pro!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        updateUser({ userType: "pro" });
+      }
+    });
+  };
+
+  const handleBlockUser = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will block the user account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#D00000",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, block user!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        updateUser({ accountStatus: "blocked" });
+      }
+    });
+  };
 
   // Status badge styling
   const getStatusBadge = (status) => {
@@ -189,7 +303,6 @@ const UserDetails = () => {
 
   return (
     <div className="space-y-6 ms-16">
-      
       {/* User Information Section */}
       <div className="bg-white rounded-lg shadow-md px-6 py-4">
         <h2 className="text-xl font-semibold mb-6">User Information</h2>
@@ -283,17 +396,41 @@ const UserDetails = () => {
         <h2 className="text-xl font-semibold mb-6">Admin Actions</h2>
         
         <div className="flex gap-4">
-          <button className="px-6 py-3 w-full text-white font-medium rounded-lg bg-[#00A62C] transition-colors flex items-center justify-center gap-2">
+          <button 
+            onClick={handleUnblockUser}
+            disabled={actionLoading || userData.status === "active"}
+            className={`px-6 py-3 w-full text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
+              actionLoading || userData.status === "active"
+                ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                : "bg-[#00A62C] hover:bg-green-700"
+            }`}
+          >
             <img src="/shield-admin.svg" alt="Shield" className="w-5 h-5" />
-            Unblock User
+            {actionLoading ? "Processing..." : userData.status === "active" ? "User Already Active" : "Unblock User"}
           </button>
-          <button className="px-6 py-3 w-full text-white font-medium rounded-lg bg-[#4A90E2] transition-colors flex items-center justify-center gap-2">
+          <button 
+            onClick={handleAssignAsPro}
+            disabled={actionLoading || userData.plan === "pro"}
+            className={`px-6 py-3 w-full text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
+              actionLoading || userData.plan === "pro"
+                ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                : "bg-[#4A90E2] hover:bg-blue-600"
+            }`}
+          >
             <img src="/verify.svg" alt="New Release" className="w-5 h-5" />
-            Assign as Pro
+            {actionLoading ? "Processing..." : userData.plan === "pro" ? "User Already Pro" : "Assign as Pro"}
           </button>
-          <button className="px-6 py-3 w-full text-white font-medium rounded-lg bg-[#D00000] transition-colors flex items-center justify-center gap-2">
+          <button 
+            onClick={handleBlockUser}
+            disabled={actionLoading || userData.status === "blocked"}
+            className={`px-6 py-3 w-full text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
+              actionLoading || userData.status === "blocked"
+                ? "bg-gray-400 opacity-50 cursor-not-allowed"
+                : "bg-[#D00000] hover:bg-red-600"
+            }`}
+          >
             <img src="/cancel-01.svg" alt="Cancel" className="w-5 h-5" />
-            Block User
+            {actionLoading ? "Processing..." : userData.status === "blocked" ? "User Already Blocked" : "Block User"}
           </button>
         </div>
       </div>
