@@ -80,6 +80,12 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+
+  // Catch-all route for invalid paths
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
