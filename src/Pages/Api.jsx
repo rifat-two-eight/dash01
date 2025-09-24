@@ -1,26 +1,44 @@
-import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { Listbox } from "@headlessui/react";
+
+const sites = [
+  "Ebay",
+  "Amazon",
+  "Temu",
+  "Subito",
+  "Alibaba",
+  "Zalando",
+  "Mediaworld",
+  "Notino",
+  "Douglas",
+  "LeroyMerlin",
+  "BackMarket",
+  "Swappie",
+];
+
+const apiPosts = ["Post 1", "Post 2", "Post 3"];
 
 const Api = () => {
-  const [selectedSite, setSelectedSite] = useState('');
-  const [apiKeyTest, setApiKeyTest] = useState('');
-  const [selectedApiKeyPost, setSelectedApiKeyPost] = useState('');
-  const [apiKeyTestPost, setApiKeyTestPost] = useState('');
+  const [selectedSite, setSelectedSite] = useState("");
+  const [apiKeyTest, setApiKeyTest] = useState("");
+  const [selectedApiKeyPost, setSelectedApiKeyPost] = useState("");
+  const [apiKeyTestPost, setApiKeyTestPost] = useState("");
 
   const handleSubmitAPI = () => {
-    console.log('Submit API clicked');
+    console.log("Submit API clicked");
   };
 
   const handleTestAPI = () => {
-    console.log('Test API clicked');
+    console.log("Test API clicked");
   };
 
   const handleGenericSearch = () => {
-    console.log('Generic Search clicked');
+    console.log("Generic Search clicked");
   };
 
   const handleAPIBaseSearch = () => {
-    console.log('API Base Search clicked');
+    console.log("API Base Search clicked");
   };
 
   const buttonClass =
@@ -36,26 +54,25 @@ const Api = () => {
               Select Site
             </label>
             <div className="relative">
-              <select
-                value={selectedSite}
-                onChange={(e) => setSelectedSite(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg  bg-white text-gray-700 appearance-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2] focus:outline-none "
-              >
-                <option value="">Please select</option>
-                <option value="site1">Ebay</option>
-                <option value="site2">Amazon</option>
-                <option value="site3">Temu</option>
-                <option value="site3">Subito</option>
-                <option value="site3">Alibaba</option>
-                <option value="site3">Zalando</option>
-                <option value="site3">Mediaworld</option>
-                <option value="site3">Notino</option>
-                <option value="site3">Douglas</option>
-                <option value="site3">LeroyMerlin</option>
-                <option value="site3">BackMarket</option>
-                <option value="site3">Swappie</option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+              <Listbox value={selectedSite} onChange={setSelectedSite}>
+                <div className="relative">
+                  <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                    {selectedSite || "Please select"}
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  </Listbox.Button>
+                  <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {sites.map((site, idx) => (
+                      <Listbox.Option
+                        key={idx}
+                        value={site}
+                        className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                      >
+                        {site}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </div>
+              </Listbox>
             </div>
           </div>
 
@@ -84,17 +101,25 @@ const Api = () => {
               Api Key Post
             </label>
             <div className="relative">
-              <select
-                value={selectedApiKeyPost}
-                onChange={(e) => setSelectedApiKeyPost(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 appearance-none focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              >
-                <option value="">Please select</option>
-                <option value="post1">Post 1</option>
-                <option value="post2">Post 2</option>
-                <option value="post3">Post 3</option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+              <Listbox value={selectedApiKeyPost} onChange={setSelectedApiKeyPost}>
+                <div className="relative">
+                  <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                    {selectedApiKeyPost || "Please select"}
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  </Listbox.Button>
+                  <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {apiPosts.map((post, idx) => (
+                      <Listbox.Option
+                        key={idx}
+                        value={post}
+                        className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                      >
+                        {post}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </div>
+              </Listbox>
             </div>
           </div>
 
@@ -119,7 +144,7 @@ const Api = () => {
 
           {/* Search Buttons Section (two block style) */}
           <div className="flex justify-center pt-4">
-            <div className="flex w-[390px] h-[99px]  rounded-xl overflow-hidden shadow-sm">
+            <div className="flex w-[390px] h-[99px] rounded-xl overflow-hidden shadow-sm">
               <button
                 onClick={handleGenericSearch}
                 className="flex-1 bg-[#4A90E2] text-white font-medium py-6 px-6 transition-colors duration-200"
@@ -128,13 +153,12 @@ const Api = () => {
               </button>
               <button
                 onClick={handleAPIBaseSearch}
-                className="flex-1 bg-white text-[#4A90E2] font-medium py-6 px-6 transition-colors duration-200"
+                className="flex-1 bg-white text-[#4A90E2] font-medium py-6 px-6 transition-colors duration-200 border-l border-[#4A90E2]"
               >
                 API Base Search
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
