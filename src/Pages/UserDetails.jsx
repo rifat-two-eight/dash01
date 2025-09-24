@@ -87,11 +87,10 @@ const UserDetails = () => {
       try {
         const res = await axios.get(`${baseURL}/user/admin/user/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
-          timeout: 15000,
+          timeout: 15000,  
         });
 
-        console.log("User details response:", res.data); // Debug log
-
+        console.log("User details response:", res.data);
         if (res.data.success) {
           const data = res.data.data;
           setUserData({
@@ -133,7 +132,7 @@ const UserDetails = () => {
     fetchUserData();
   }, [id, token, navigate]);
 
-  // Update user status or plan
+  // Update user status or plan 
   const updateUser = async (updateData) => {
     setActionLoading(true);
     try {

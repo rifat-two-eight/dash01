@@ -18,6 +18,7 @@ import Advertising from "./Pages/Advertising";
 import SetPasswordRoute from "./Pages/SetPasswordRoute";
 import PrivateRoute from "./Pages/PrivateRoute";
 import UserDetails from "./Pages/UserDetails";
+import Api from "./Pages/Api";
 
 const router = createBrowserRouter([
   // Public routes
@@ -61,6 +62,7 @@ const router = createBrowserRouter([
       { path: "terms", element: <Terms /> },
       { path: "feedback", element: <Feedback /> },
       { path: "advertising", element: <Advertising /> },
+      { path: "api-key", element: <Api /> },
     ],
   },
 
@@ -81,7 +83,7 @@ const router = createBrowserRouter([
     ),
   },
 
-  // Catch-all route for invalid paths
+  // Catch-all route for invalid paths 
   {
     path: "*",
     element: <ErrorPage />,

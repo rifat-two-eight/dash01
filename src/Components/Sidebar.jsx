@@ -11,6 +11,7 @@ const Sidebar = () => {
     { path: "/dashboard/advertising", label: "Advertising", icon: "/advertisiment.svg" },
     { path: "/dashboard/feedback", label: "Feedback", icon: "/Group 4.svg" },
     { path: "/dashboard/terms", label: "Terms & Conditions", icon: "/shield-01.svg" },
+    { path: "/dashboard/api-key", label: "API Key", icon: "/api.svg" },
   ];
 
   return (

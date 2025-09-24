@@ -38,6 +38,8 @@ const Header = () => {
         return "Subscription";
       case "/dashboard/feedback":
         return "Feedback";
+      case "/dashboard/api-key":
+        return "API Key";
       default:
         return "";
     }
