@@ -8,27 +8,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const Histogram = () => {
-  const userChartData = [
-    { month: "Jan", proUser: 4200, freeUser: 3000 },
-    { month: "Feb", proUser: 4800, freeUser: 2900 },
-    { month: "Mar", proUser: 5200, freeUser: 3100 },
-    { month: "Apr", proUser: 3900, freeUser: 2800 },
-    { month: "May", proUser: 5500, freeUser: 3300 },
-    { month: "Jun", proUser: 5100, freeUser: 3400 },
-    { month: "Jul", proUser: 5800, freeUser: 3600 },
-    { month: "Aug", proUser: 4900, freeUser: 3200 },
-    { month: "Sep", proUser: 5300, freeUser: 3100 },
-    { month: "Oct", proUser: 5600, freeUser: 2900 },
-    { month: "Nov", proUser: 4800, freeUser: 3000 },
-    { month: "Dec", proUser: 5000, freeUser: 3100 },
-  ];
-
+const Histogram = ({ activityData }) => {
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm">
       {/* Title and Legend */}
       <div className="flex justify-between items-center p-5 mb-4">
-        <h2 className="text-lg ms-5 text-[#454b60] font-medium">User Activity</h2>
+        <h2 className="text-lg ms-5 text-[#454b60] font-medium">
+          User Activity (Current Year)
+        </h2>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
             <span className="w-3 h-3 bg-[#86b5ec]"></span>
@@ -44,7 +31,7 @@ const Histogram = () => {
       {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <BarChart
-          data={userChartData}
+          data={activityData}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           barCategoryGap="30%"
           barGap={0}
