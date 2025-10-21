@@ -8,25 +8,55 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const Revenue = () => {
-  const revenueData = [
-    { month: "Jan", subscription: 3200, advertisement: 2200 },
-    { month: "Feb", subscription: 4000, advertisement: 2400 },
-    { month: "Mar", subscription: 4600, advertisement: 2800 },
-    { month: "Apr", subscription: 3500, advertisement: 2000 },
-    { month: "May", subscription: 4800, advertisement: 2700 },
-    { month: "Jun", subscription: 5000, advertisement: 3100 },
-    { month: "Jul", subscription: 5300, advertisement: 3000 },
-    { month: "Aug", subscription: 4700, advertisement: 2800 },
-    { month: "Sep", subscription: 5100, advertisement: 3200 },
-    { month: "Oct", subscription: 5500, advertisement: 3300 },
-    { month: "Nov", subscription: 5000, advertisement: 2900 },
-    { month: "Dec", subscription: 5200, advertisement: 3100 },
-  ];
+const Revenue = ({ revenueData = [] }) => {
+  // DEBUG: Log incoming data
+  console.log("📥 Revenue Data RECEIVED:", revenueData);
+
+  // ✅ FIXED: Handle CORRECT AdMob API response structure
+  const chartData = (revenueData || []).map((item, index) => {
+    // AdMob API returns: { dimensions: [{value: "2025-10-01"}], metricValues: [{value: "5.23"}] }
+    const date = item.dimensions?.[0]?.value || `Day ${index + 1}`;
+    const revenue = parseFloat(item.metricValues?.[0]?.value || item.revenue || 0);
+    
+    return {
+      month: date.split('-')[2], // Extract day: "2025-10-01" → "01"
+      subscription: 0,
+      advertisement: revenue
+    };
+  });
+
+  console.log("📈 Chart Data AFTER Transform:", chartData);
+
+  // If no data, show loading
+  if (chartData.length === 0 || chartData.every(item => item.advertisement === 0)) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-sm h-[500px] flex flex-col">
+        <div className="flex justify-between items-center p-5 mb-4">
+          <h2 className="text-lg ms-5 text-[#454b60] font-medium">Revenue</h2>
+          <div className="flex space-x-4">
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-[#4A90E2]"></span>
+              <span className="text-xs text-[#454b60]">Monthly Baseline</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-[#00c471]"></span>
+              <span className="text-xs text-[#454b60]">Subscription Revenue</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-[#ffc107]"></span>
+              <span className="text-xs text-[#454b60]">Advertisement Revenue</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-500 text-sm">Loading AdMob revenue data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm h-[500px] flex flex-col">
-      {/* Header + Legend */}
       <div className="flex justify-between items-center p-5 mb-4">
         <h2 className="text-lg ms-5 text-[#454b60] font-medium">Revenue</h2>
         <div className="flex space-x-4">
@@ -45,13 +75,9 @@ const Revenue = () => {
         </div>
       </div>
 
-      {/* Chart */}
       <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={revenueData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-          >
+          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               dataKey="month"
@@ -72,6 +98,7 @@ const Revenue = () => {
                 borderRadius: "6px",
                 fontSize: "14px",
               }}
+              formatter={(value) => [`$${value.toFixed(2)}`, "Advertisement"]}
             />
             <Line
               type="linear"
@@ -80,7 +107,6 @@ const Revenue = () => {
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
-              activeDot={false}
             />
             <Line
               type="monotone"

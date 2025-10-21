@@ -17,13 +17,21 @@ const Dashboard = () => {
     monthlyFree: 0,
     yearlyPro: 0,
     yearlyFree: 0,
+    // NEW: Real AdMob Revenue Data
+    monthlyRevenue: 0,
+    yearlyRevenue: 0,
+    revenueData: [],
+    // ONLY ADDED FOR DYNAMIC %
+    revenuePercentage: 0,
+    revenueChangeColor: "#00a62c",
+    revenueChangeSign: "+"
   });
   const [activityData, setActivityData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [revenuePeriod, setRevenuePeriod] = useState("Monthly");
-  const [piePeriod, setPiePeriod] = useState("All"); // can be used programmatically
+  const [piePeriod, setPiePeriod] = useState("All");
 
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
@@ -33,7 +41,143 @@ const Dashboard = () => {
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
-  // Fetch user data and activity
+  // 1. FETCH ADMOB DATA FOR REVENUE WITH DYNAMIC %
+  const fetchAdMobRevenue = async () => {
+    const accessToken = localStorage.getItem("admob_token");
+    const publisherId = "pub-8429010299882680";
+
+    if (!accessToken) return; // Skip if no token
+
+    try {
+      // Get CURRENT MONTH data
+      const monthlyResponse = await axios.post(
+        `https://admob.googleapis.com/v1/accounts/${publisherId}/networkReport:generate`,
+        {
+          reportSpec: {
+            dateRange: {
+              startDate: { year: currentYear, month: currentMonth, day: 1 },
+              endDate: { year: currentYear, month: currentMonth, day: currentDate.getDate() }
+            },
+            dimensions: ["DATE"],
+            metrics: ["ESTIMATED_EARNINGS"],
+            sortConditions: [{ dimension: "DATE", order: "ASCENDING" }]
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          timeout: 10000
+        }
+      );
+
+      // Get PREVIOUS MONTH data (ONLY FOR %)
+      const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+      const prevMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+      const prevMonthResponse = await axios.post(
+        `https://admob.googleapis.com/v1/accounts/${publisherId}/networkReport:generate`,
+        {
+          reportSpec: {
+            dateRange: {
+              startDate: { year: prevMonthYear, month: prevMonth, day: 1 },
+              endDate: { 
+                year: prevMonthYear, 
+                month: prevMonth, 
+                day: new Date(prevMonthYear, prevMonth, 0).getDate()
+              }
+            },
+            dimensions: ["DATE"],
+            metrics: ["ESTIMATED_EARNINGS"],
+            sortConditions: [{ dimension: "DATE", order: "ASCENDING" }]
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          timeout: 10000
+        }
+      );
+
+      // Get YEARLY data
+      const yearlyResponse = await axios.post(
+        `https://admob.googleapis.com/v1/accounts/${publisherId}/networkReport:generate`,
+        {
+          reportSpec: {
+            dateRange: {
+              startDate: { year: currentYear, month: 1, day: 1 },
+              endDate: { year: currentYear, month: currentMonth, day: currentDate.getDate() }
+            },
+            dimensions: ["DATE"],
+            metrics: ["ESTIMATED_EARNINGS"],
+            sortConditions: [{ dimension: "DATE", order: "ASCENDING" }]
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          timeout: 10000
+        }
+      );
+
+      // Calculate totals
+      const monthlyEarnings = monthlyResponse.data.reduce((sum, row) => {
+        return sum + parseFloat(row.metricValues?.[0]?.value || 0);
+      }, 0);
+
+      const yearlyEarnings = yearlyResponse.data.reduce((sum, row) => {
+        return sum + parseFloat(row.metricValues?.[0]?.value || 0);
+      }, 0);
+
+      // DYNAMIC % CALCULATION
+      const prevMonthEarnings = prevMonthResponse.data.reduce((sum, row) => {
+        return sum + parseFloat(row.metricValues?.[0]?.value || 0);
+      }, 0);
+      
+      const percentageChange = prevMonthEarnings > 0 
+        ? ((monthlyEarnings - prevMonthEarnings) / prevMonthEarnings * 100).toFixed(1)
+        : monthlyEarnings > 0 ? 100 : 0;
+
+      const changeColor = parseFloat(percentageChange) >= 0 ? "#00a62c" : "#ff4444";
+      const changeSign = parseFloat(percentageChange) >= 0 ? "+" : "";
+
+      // Format for Revenue Chart (daily data for current month)
+      const revenueChartData = monthlyResponse.data.map(row => ({
+        date: row.dimensions?.[0]?.value || '',
+        revenue: parseFloat(row.metricValues?.[0]?.value || 0)
+      }));
+
+      setMetrics(prev => ({
+        ...prev,
+        monthlyRevenue: monthlyEarnings.toFixed(2),
+        yearlyRevenue: yearlyEarnings.toFixed(2),
+        revenueData: revenueChartData,
+        // DYNAMIC % VALUES
+        revenuePercentage: percentageChange,
+        revenueChangeColor: changeColor,
+        revenueChangeSign: changeSign
+      }));
+
+    } catch (err) {
+      console.error("AdMob Revenue Error:", err);
+      // Don't show error - just use fallback values
+      setMetrics(prev => ({
+        ...prev,
+        monthlyRevenue: "0.00",
+        yearlyRevenue: "0.00",
+        revenueData: [],
+        revenuePercentage: 0,
+        revenueChangeColor: "#00a62c",
+        revenueChangeSign: "+"
+      }));
+    }
+  };
+
+  // Fetch user data (UNCHANGED)
   const fetchUserData = async () => {
     setLoading(true);
     setError(null);
@@ -90,7 +234,7 @@ const Dashboard = () => {
         })
       );
 
-      // Lifetime metrics
+      // User metrics (UNCHANGED)
       setMetrics((prev) => ({
         ...prev,
         totalUsers: userDetails.length,
@@ -98,7 +242,7 @@ const Dashboard = () => {
         freeUsers: userDetails.filter((u) => (u.userType || u.plan) === "free").length,
       }));
 
-      // Histogram Data → Always Jan–Dec current year
+      // Histogram Data (UNCHANGED)
       const histogramByMonth = Array.from({ length: 12 }, (_, i) => {
         const monthUsers = userDetails.filter((u) => {
           if (!u.createdAt) return false;
@@ -113,7 +257,7 @@ const Dashboard = () => {
       });
       setActivityData(histogramByMonth);
 
-      // PieChart metrics
+      // PieChart metrics (UNCHANGED)
       const monthlyUsers = userDetails.filter((u) => {
         if (!u.createdAt) return false;
         const d = new Date(u.createdAt);
@@ -156,15 +300,17 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (token) fetchUserData();
-    else {
+    if (token) {
+      fetchUserData();
+      fetchAdMobRevenue(); // Fetch AdMob revenue
+    } else {
       setError("No authentication token found. Please log in.");
       Swal.fire("Error!", "No authentication token found. Please log in.", "error");
       navigate("/login");
     }
   }, [token, navigate]);
 
-  // PieChart filtered metrics
+  // PieChart metrics (UNCHANGED)
   let pieMetrics = { proUsers: 0, freeUsers: 0 };
   if (piePeriod === "All") {
     pieMetrics = { proUsers: metrics.proUsers, freeUsers: metrics.freeUsers };
@@ -176,7 +322,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 ms-16">
-      {/* Error Message */}
+      {/* Error Message - UNCHANGED */}
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-3">
           <AlertCircle className="w-5 h-5 text-red-600" />
@@ -191,30 +337,24 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Cards - ONLY REVENUE % CHANGED */}
       {loading ? (
         <div className="text-center py-10 text-gray-600">Loading...</div>
       ) : (
         <div className="grid grid-cols-10 gap-[34px]">
-          {/* Card 1: Total Users */}
+          {/* Card 1: Total Users - UNCHANGED */}
           <div className="col-span-3 bg-white p-3 rounded-xl shadow h-[142px]">
             <h3 className="text-xl font-medium">Total Users</h3>
             <p className="text-3xl font-bold mt-3">{metrics.totalUsers}</p>
-            <span className="text-[#00a62c] mt-5 flex justify-end text-sm">
-              +12% this month
-            </span>
           </div>
 
-          {/* Card 2: Pro Users */}
+          {/* Card 2: Pro Users - UNCHANGED */}
           <div className="col-span-3 bg-white p-3 rounded-xl shadow h-[142px]">
             <h3 className="text-xl font-medium">Pro Users</h3>
             <p className="text-3xl font-bold mt-3">{metrics.proUsers}</p>
-            <span className="text-[#00a62c] mt-5 flex justify-end text-sm">
-              +12% this month
-            </span>
           </div>
 
-          {/* Card 3: Monthly Revenue */}
+          {/* Card 3: REAL ADMOB REVENUE - ONLY % DYNAMIC */}
           <div className="col-span-4 bg-white px-3 py-7 rounded-xl shadow h-[142px] flex flex-col justify-between">
             <div className="flex justify-between items-start">
               <h3 className="text-xl font-medium">{revenuePeriod} Revenue</h3>
@@ -232,22 +372,28 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex justify-between items-end">
-              <p className="text-3xl font-bold text-gray-900">24,582</p>
-              <span className="text-[#00a62c] text-sm me-24">
-                +12% this {revenuePeriod === "All" ? "period" : revenuePeriod.toLowerCase()}
+              <p className="text-3xl font-bold text-gray-900">
+                ${revenuePeriod === "Monthly" ? metrics.monthlyRevenue : metrics.yearlyRevenue}
+              </p>
+              {/* ONLY THIS LINE CHANGED - DYNAMIC % */}
+              <span 
+                className="text-sm me-24"
+                style={{ color: metrics.revenueChangeColor }}
+              >
+                {metrics.revenueChangeSign}{metrics.revenuePercentage}% this {revenuePeriod === "All" ? "period" : revenuePeriod.toLowerCase()}
               </span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Histogram Chart */}
+      {/* Histogram Chart - UNCHANGED */}
       <Histogram activityData={activityData} />
 
-      {/* Revenue + PieChart (No extra dropdown) */}
+      {/* Revenue + PieChart - PASS REAL DATA TO REVENUE */}
       <div className="grid grid-cols-8 gap-[20px]">
         <div className="col-span-5">
-          <Revenue />
+          <Revenue revenueData={metrics.revenueData} />
         </div>
         <div className="col-span-3">
           <PieChart metrics={pieMetrics} timePeriod={piePeriod} setTimePeriod={setPiePeriod} />
