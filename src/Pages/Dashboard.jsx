@@ -35,7 +35,7 @@ const Dashboard = () => {
 
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5000/api/v1";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
 
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();

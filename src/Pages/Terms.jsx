@@ -23,7 +23,7 @@ const Terms = () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          "http://10.10.7.106:5000/api/v1/terms-conditions",
+          "http://10.10.7.106:5001/api/v1/terms-conditions",
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 15000,
@@ -95,7 +95,7 @@ const Terms = () => {
       if (isModal && editingTermId) {
         // Update using PATCH
         res = await axios.patch(
-          `http://10.10.7.106:5000/api/v1/terms-conditions/${editingTermId}`,
+          `http://10.10.7.106:5001/api/v1/terms-conditions/${editingTermId}`,
           { content: contentToSave },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -105,7 +105,7 @@ const Terms = () => {
       } else {
         // Create
         res = await axios.post(
-          "http://10.10.7.106:5000/api/v1/terms-conditions",
+          "http://10.10.7.106:5001/api/v1/terms-conditions",
           {
             content: contentToSave,
             version: `v${(allTerms[0]?.version ? parseFloat(allTerms[0].version.slice(1)) + 0.1 : 1.0).toFixed(1)}`,
@@ -121,7 +121,7 @@ const Terms = () => {
       if (res.data.success) {
         // Refresh list
         const refreshRes = await axios.get(
-          "http://10.10.7.106:5000/api/v1/terms-conditions",
+          "http://10.10.7.106:5001/api/v1/terms-conditions",
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 15000,
@@ -197,7 +197,7 @@ const Terms = () => {
     setError(null);
     try {
       const res = await axios.delete(
-        `http://10.10.7.106:5000/api/v1/terms-conditions/${termId}`,
+        `http://10.10.7.106:5001/api/v1/terms-conditions/${termId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 15000,
@@ -207,7 +207,7 @@ const Terms = () => {
       if (res.data.success) {
         // Refresh list
         const refreshRes = await axios.get(
-          "http://10.10.7.106:5000/api/v1/terms-conditions",
+          "http://10.10.7.106:5001/api/v1/terms-conditions",
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 15000,

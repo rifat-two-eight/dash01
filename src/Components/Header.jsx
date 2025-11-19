@@ -17,8 +17,8 @@ const Header = () => {
   const dropdownRef = useRef(null);
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
-  const baseURL = "http://10.10.7.106:5000/api/v1";
-  const imageBaseURL = "http://10.10.7.106:5000";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
+  const imageBaseURL = "http://10.10.7.106:5001";
   const defaultImage = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
 
   const getTitle = (path) => {

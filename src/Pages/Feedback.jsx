@@ -21,7 +21,7 @@ const Feedback = () => {
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(3); // Initially show 3 pending reviews
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5000/api/v1";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
   const defaultImage = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
   const initialPageSize = 3;
   const pageSizeIncrement = 5;

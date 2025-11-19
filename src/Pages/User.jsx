@@ -20,7 +20,7 @@ const User = () => {
   const [accountType, setAccountType] = useState("");
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5000/api/v1";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
 
   // Fetch users and their details
   const fetchUserData = async () => {

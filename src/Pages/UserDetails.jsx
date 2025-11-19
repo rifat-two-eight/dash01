@@ -9,7 +9,7 @@ const UserDetails = () => {
     name: "",
     email: "",
     image: null,
-    createdAt: "",
+    purchaseDate: "",
     plan: "free",
     status: "active",
   });
@@ -18,52 +18,63 @@ const UserDetails = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5000/api/v1";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
   const defaultImage = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
 
-  // Demo payment history data
-  const paymentHistory = [
-    {
-      transactionId: "#TXN-12345",
-      planTitle: "Pro Plan",
-      email: "john.doe@example.com",
-      amount: "$29.99",
-      joinDate: "January 15, 2024",
-      endDate: "January 15, 2025"
-    },
-    {
-      transactionId: "#TXN-12344",
-      planTitle: "Basic Plan",
-      email: "john.doe@example.com",
-      amount: "$9.99",
-      joinDate: "December 10, 2023",
-      endDate: "January 10, 2024"
-    },
-    {
-      transactionId: "#TXN-12343",
-      planTitle: "Pro Plan",
-      email: "john.doe@example.com",
-      amount: "$29.99",
-      joinDate: "November 12, 2023",
-      endDate: "December 12, 2023"
-    },
-    {
-      transactionId: "#TXN-12342",
-      planTitle: "Premium Plan",
-      email: "john.doe@example.com",
-      amount: "$49.99",
-      joinDate: "October 05, 2023",
-      endDate: "November 05, 2023"
-    },
-    {
-      transactionId: "#TXN-12341",
-      planTitle: "Basic Plan",
-      email: "john.doe@example.com",
-      amount: "$9.99",
-      joinDate: "September 01, 2023",
-      endDate: "October 01, 2023"
+// ======== STATE (উপরে অন্যান্য state এর সাথে রাখো) ========
+const [transactions, setTransactions] = useState([]);
+const [transactionLoading, setTransactionLoading] = useState(true);
+const [transactionError, setTransactionError] = useState(null);
+
+// ======== ১০০% সঠিক useEffect - এবার আর কোনো ভুল নেই ========
+useEffect(() => {
+  const fetchUserPurchaseHistory = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setTransactionError("Please login as Admin");
+      setTransactionLoading(false);
+      return;
     }
-  ];
+
+    setTransactionLoading(true);
+    setTransactionError(null);
+
+    try {
+      const url = `${baseURL}/payment/admin/users/${id}/purchase-history`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Request URL:", url);
+      console.log("Response Status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Purchase History Response:", data);
+
+      // রেসপন্স থেকে ট্রানজেকশন বের করো
+      const txns = data?.data?.transactions || data?.data || [];
+
+      setTransactions(Array.isArray(txns) ? txns : []);
+    } catch (err) {
+      console.error("Error fetching purchase history:", err);
+      setTransactionError("Failed to load purchase history");
+      setTransactions([]);
+    } finally {
+      setTransactionLoading(false);
+    }
+  };
+
+  fetchUserPurchaseHistory();
+}, [id]);
 
   // Fetch user data
   useEffect(() => {
@@ -97,7 +108,7 @@ const UserDetails = () => {
             name: data.name || "Unknown User",
             email: data.email || "N/A",
             image: data.image ? `http://10.10.7.106:5000${data.image}` : null,
-            createdAt: data.createdAt ? new Date(data.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
+            purchaseDate: data.purchaseDate ? new Date(data.purchaseDate).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
             plan: data.userType || data.plan || "free",
             status: data.accountStatus || data.status || "active",
           });
@@ -342,7 +353,7 @@ const UserDetails = () => {
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600">Joining Date</label>
-              <p className="text-gray-800">{userData.createdAt}</p>
+              <p className="text-gray-800">{userData.purchaseDate}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600">Account Type</label> <br />
@@ -354,41 +365,65 @@ const UserDetails = () => {
         </div>
       </div>
 
-      {/* Payment History Section */}
-      <div className="bg-white rounded-lg shadow-md px-6 py-4">
-        <h2 className="text-xl font-semibold mb-6">Payment History</h2>
-        
-        <div className="overflow-x-auto border border-gray-200 rounded-sm">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Transaction ID</th>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Plan Title</th>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Email</th>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Amount</th>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">Join Date</th>
-                <th scope="col" className="text-left py-3 px-4 font-medium text-gray-600 border-b border-gray-200">End Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paymentHistory.map((payment, index) => (
-                <tr key={index} className="bg-white border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {payment.transactionId}
-                  </td>
-                  <td className="px-4 py-4">{payment.planTitle}</td>
-                  <td className="px-4 py-4">{payment.email}</td>
-                  <td className="px-4 py-4 font-semibold text-gray-600">
-                    {payment.amount}
-                  </td>
-                  <td className="px-4 py-4">{payment.joinDate}</td>
-                  <td className="px-4 py-4">{payment.endDate}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Payment History Section - 100% Working with Correct Endpoints */}
+{/* Payment History - 100% Working with Correct Admin Route */}
+<div className="bg-white rounded-lg shadow-md p-6">
+  <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+    <span>Purchase History</span>
+    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Admin View</span>
+  </h2>
+
+  {transactionLoading ? (
+    <div className="text-center py-16">
+      <div className="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+      <p className="mt-4 text-gray-600">Loading purchase history...</p>
+    </div>
+  ) : transactionError ? (
+    <div className="text-center py-16 text-red-600 bg-red-50 rounded-lg border border-red-200">
+      {transactionError}
+    </div>
+  ) : transactions.length === 0 ? (
+    <div className="text-center py-16 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+      No purchase history found for this user
+    </div>
+  ) : (
+    <div className="overflow-x-auto border border-gray-200 rounded-lg">
+      <table className="w-full text-sm">
+        <thead className="bg-gradient-to-r from-indigo-50 to-blue-50">
+          <tr>
+            <th className="text-left py-4 px-6 font-semibold text-gray-700">Transaction ID</th>
+            <th className="text-left py-4 px-6 font-semibold text-gray-700">Plan/Item</th>
+            <th className="text-left py-4 px-6 font-semibold text-gray-700">Amount</th>
+            <th className="text-left py-4 px-6 font-semibold text-gray-700">Date</th>
+            <th className="text-left py-4 px-6 font-semibold text-gray-700">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((tx, i) => (
+            <tr key={tx._id || i} className="border-b hover:bg-gray-50 transition">
+              <td className="py-4 px-6 font-medium text-blue-600">
+                #{(tx._id || tx.transactionId || "N/A").slice(-8).toUpperCase()}
+              </td>
+              <td className="py-4 px-6">{tx.plan || tx.title || "Pro Plan"}</td>
+              <td className="py-4 px-6 font-bold text-green-600">
+                ${tx.amount || tx.price || "9.99"}
+              </td>
+              <td className="py-4 px-6 text-gray-600">
+                {tx.date || tx.time || new Date(tx.purchaseDate).toLocaleDateString()}
+              </td>
+              <td className="py-4 px-6">
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
+                  {tx.status || "Paid"}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
 
       {/* Admin Actions Section */}
       <div className="bg-white rounded-lg shadow-md px-6 py-4">

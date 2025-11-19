@@ -11,7 +11,7 @@ const NameChange = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const baseURL = "http://10.10.7.106:5000/api/v1";
+  const baseURL = "http://10.10.7.106:5001/api/v1";
 
   // Fetch current user data on mount
   useEffect(() => {
