@@ -19,7 +19,6 @@ import SetPasswordRoute from "./Pages/SetPasswordRoute";
 import PrivateRoute from "./Pages/PrivateRoute";
 import UserDetails from "./Pages/UserDetails";
 import Api from "./Pages/Api";
-import PlanSub from "./Pages/PlanSub";
 
 const router = createBrowserRouter([
   // Public routes
@@ -64,7 +63,6 @@ const router = createBrowserRouter([
       { path: "feedback", element: <Feedback /> },
       { path: "advertising", element: <Advertising /> },
       { path: "api-key", element: <Api /> },
-      { path: "plan", element: <PlanSub /> },
     ],
   },
 

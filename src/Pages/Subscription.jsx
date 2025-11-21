@@ -315,17 +315,6 @@ const Subscription = () => {
         </div>
       </div>
 
-      {/* Add New Subscription */}
-      <Link to="/dashboard/plan">
-        <div>
-          <button className="bg-[#4A90E2] text-white px-4 py-2 rounded-md flex justify-self-end mb-5">
-            <span className="mr-2">
-              <img src="/plus.svg" alt="+" />
-            </span> 
-            Add New Subscription
-          </button>
-        </div>
-      </Link>
 
       {/* Subscriptions List */}
       <div className="bg-white rounded-lg p-6">
