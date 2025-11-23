@@ -31,7 +31,7 @@ const Login = () => {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.post("http://10.10.7.106:5001/api/v1/auth/login", {
+      const res = await axios.post("https://api.yespend.com/api/v1/auth/login", {
         email,
         password,
       });

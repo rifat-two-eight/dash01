@@ -24,7 +24,7 @@ const Forgot = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://10.10.7.106:5001/api/v1/auth/forget-password",
+        "https://api.yespend.com/api/v1/auth/forget-password",
         { email }
       );
 
@@ -70,7 +70,7 @@ const Forgot = () => {
     try {
       // Use the same API endpoint as send OTP
       const res = await axios.post(
-        "http://10.10.7.106:5001/api/v1/auth/forget-password",
+        "https://api.yespend.com/api/v1/auth/forget-password",
         { email }
       );
 
@@ -115,7 +115,7 @@ const Forgot = () => {
     try {
       console.log("Verifying OTP for email:", email, "OTP:", otp);
       
-      const response = await axios.post("http://10.10.7.106:5001/api/v1/auth/verify-email", {
+      const response = await axios.post("https://api.yespend.com/api/v1/auth/verify-email", {
         email: email,
         oneTimeCode: parseInt(otp)
       });

@@ -18,7 +18,7 @@ const UserDetails = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5001/api/v1";
+  const baseURL = "https://api.yespend.com/api/v1";
   const defaultImage = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
 
 // ======== STATE (উপরে অন্যান্য state এর সাথে রাখো) ========

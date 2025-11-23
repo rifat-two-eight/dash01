@@ -16,7 +16,7 @@ const Subscription = () => {
   const [revenueChangeColor, setRevenueChangeColor] = useState("#20B146");
 
   const navigate = useNavigate();
-  const baseURL = "http://10.10.7.106:5001/api/v1";
+  const baseURL = "https://api.yespend.com/api/v1";
   const token = localStorage.getItem("token");
 
   // FETCH SUBSCRIPTION DATA

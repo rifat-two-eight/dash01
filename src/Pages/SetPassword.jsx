@@ -53,7 +53,7 @@ const SetPassword = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://10.10.7.106:5001/api/v1/auth/reset-password",
+        "https://api.yespend.com/api/v1/auth/reset-password",
         {
           newPassword,
           confirmPassword,
