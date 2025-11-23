@@ -113,6 +113,7 @@ const Header = () => {
         throw new Error(res.data.message || "Failed to load user profile");
       }
     } catch (err) {
+      console.log(err)
       console.error("Error fetching user profile:", err.response?.data || err);
       if (retryCount < 1 && err.response?.status !== 401 && err.response?.status !== 403) {
         // Retry once after a short delay
@@ -125,7 +126,7 @@ const Header = () => {
           : err.response?.status === 401 || err.response?.data?.message?.includes("Session Expired")
           ? "Session expired. Please log in again."
           : err.response?.status === 403
-          ? "Access denied: Admin or Super Admin privileges required. Try logging in with atiqurrahmanrifat799@gmail.com."
+          ? "Access denied: Admin or Super Admin privileges required. Try logging in with admin@yespend.com."
           : err.response?.status === 404 || err.response?.data?.message?.includes("Not found")
           ? "User profile not found."
           : err.response?.data?.message || "Failed to load user profile.";
