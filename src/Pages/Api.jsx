@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Listbox } from "@headlessui/react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const sites = [
   "Amazon",
@@ -13,13 +15,50 @@ const sites = [
 const environments = ["Sandbox", "Production"];
 
 const Api = () => {
-  // Separate state for Submit API section
+  const baseURL = "http://10.10.7.106:5001/api/v1";
+  const token = localStorage.getItem("token");
+
+  // Submit API Section
   const [submitSelectedSite, setSubmitSelectedSite] = useState("");
   const [submitSelectedEnvironment, setSubmitSelectedEnvironment] = useState("");
 
-  // Separate state for Test API section
+  // Test API Section
   const [testSelectedSite, setTestSelectedSite] = useState("");
   const [testSelectedEnvironment, setTestSelectedEnvironment] = useState("");
+
+  // এই ফাংশন Generic বা API চাপলে কল হবে
+  const handleSearchType = async (type) => {
+    if (!token) {
+      Swal.fire("Error", "Please login first!", "error");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${baseURL}/marketplace/searchType`,
+        { type },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: `${type === "GENERIC" ? "Generic" : "API Base"} Search activated`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      Swal.fire("Failed", err.response?.data?.message || "Something went wrong", "error");
+    }
+  };
+
+  const handleGenericSearch = () => handleSearchType("GENERIC");
+  const handleAPIBaseSearch = () => handleSearchType("API");
 
   const handleTestAPI = () => {
     console.log("Test API clicked");
@@ -27,14 +66,6 @@ const Api = () => {
 
   const handleSubmitAPI = () => {
     console.log("Submit API clicked");
-  };
-
-  const handleGenericSearch = () => {
-    console.log("Generic Search clicked");
-  };
-
-  const handleAPIBaseSearch = () => {
-    console.log("API Base Search clicked");
   };
 
   const buttonClass =
@@ -70,7 +101,7 @@ const Api = () => {
                 </div>
               </Listbox>
             </div>
-            
+
             <label className="block text-sm font-medium text-gray-700">
               Client Id <span className="text-red-500">*</span>
             </label>
@@ -79,7 +110,7 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               Client Secret <span className="text-red-500">*</span>
             </label>
@@ -88,16 +119,16 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
-              Refresh Token 
+              Refresh Token
             </label>
             <input
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               AWS Access Key ID
             </label>
@@ -106,7 +137,7 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               AWS Secret Access Key
             </label>
@@ -115,16 +146,16 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
-              Marketplace Id 
+              Marketplace Id
             </label>
             <input
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               Environment
             </label>
@@ -157,9 +188,8 @@ const Api = () => {
             </button>
           </div>
 
-          {/* Test API Section */}
+          {/* Test API Section - ঠিক তোমার আগের মতোই */}
           <div className="space-y-2">
-
             <label className="block text-sm font-medium text-gray-700">
               Marketplace Name <span className="text-red-500">*</span>
             </label>
@@ -184,7 +214,8 @@ const Api = () => {
                 </div>
               </Listbox>
             </div>
-            
+
+            {/* বাকি ইনপুটগুলো একদম আগের মতোই */}
             <label className="block text-sm font-medium text-gray-700">
               Client Id <span className="text-red-500">*</span>
             </label>
@@ -193,7 +224,7 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               Client Secret <span className="text-red-500">*</span>
             </label>
@@ -202,16 +233,16 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
-              Refresh Token 
+              Refresh Token
             </label>
             <input
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               AWS Access Key ID
             </label>
@@ -220,7 +251,7 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               AWS Secret Access Key
             </label>
@@ -229,16 +260,16 @@ const Api = () => {
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
-              Marketplace Id 
+              Marketplace Id
             </label>
             <input
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
             />
-            
+
             <label className="block text-sm font-medium text-gray-700">
               Environment
             </label>
@@ -271,7 +302,7 @@ const Api = () => {
             </button>
           </div>
 
-          {/* Search Buttons Section (two block style) */}
+          {/* Search Buttons Section - এখানে API কল হবে */}
           <div className="flex justify-center pt-4">
             <div className="flex w-[390px] h-[99px] rounded-xl overflow-hidden shadow-sm">
               <button
