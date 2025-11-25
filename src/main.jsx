@@ -19,6 +19,7 @@ import SetPasswordRoute from "./Pages/SetPasswordRoute";
 import PrivateRoute from "./Pages/PrivateRoute";
 import UserDetails from "./Pages/UserDetails";
 import Api from "./Pages/Api";
+import Privacy from "./Pages/Privacy";
 
 const router = createBrowserRouter([
   // Public routes
@@ -81,6 +82,11 @@ const router = createBrowserRouter([
         <PhotoChange />
       </PrivateRoute>
     ),
+  },
+
+  {
+    path:"/privacy",
+    element:<Privacy></Privacy>
   },
 
   // Catch-all route for invalid paths 
