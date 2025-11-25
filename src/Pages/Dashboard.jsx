@@ -44,8 +44,7 @@ const Dashboard = () => {
   // 1. FETCH ADMOB DATA FOR REVENUE WITH DYNAMIC %
   const fetchAdMobRevenue = async () => {
     const accessToken = localStorage.getItem("admob_token");
-    const publisherId = "pub-8429010299882680";
-
+    const publisherId = "pub-7017672768951042";
     if (!accessToken) return; // Skip if no token
 
     try {

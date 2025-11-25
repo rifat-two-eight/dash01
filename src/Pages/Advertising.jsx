@@ -12,10 +12,10 @@ const Advertising = () => {
   const [lifetimeRevenue, setLifetimeRevenue] = useState("0.00");
   const [revenueData, setRevenueData] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [revenuePercentage, setRevenuePercentage] = useState("12");
+  const [revenuePercentage, setRevenuePercentage] = useState("0.00");
   const [revenueChangeColor, setRevenueChangeColor] = useState("#20B146");
 
-  const publisherId = "pub-8429010299882680";
+  const publisherId = "pub-7017672768951042";
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
@@ -144,8 +144,8 @@ const Advertising = () => {
           const date = new Date(row.dimensions?.[0]?.value).toLocaleDateString('MM/dd/yyyy');
           return {
             date,
-            impressions: Math.round(Math.random() * 10000 + 100000).toLocaleString(), // Real: row.metricValues[1].value
-            clicks: Math.round(Math.random() * 1000 + 800).toLocaleString(), // Real: row.metricValues[2].value
+            impressions: parseInt(row.metricValues?.[1]?.value || 0).toLocaleString(),
+            clicks: parseInt(row.metricValues?.[2]?.value || 0).toLocaleString(),
             revenue: `$${(parseFloat(row.metricValues?.[0]?.value || 0)).toFixed(2)}`
           };
         });
