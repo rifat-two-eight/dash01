@@ -4,29 +4,26 @@ import { Listbox } from "@headlessui/react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const sites = [
-  "Amazon",
-  "Ebay",
-  "Alibaba",
-  "Zalando",
-  "leroy_merlin",
-];
-
+const sites = ["Amazon", "Ebay", "Alibaba", "Zalando", "leroy_merlin"];
 const environments = ["Sandbox", "Production"];
 
 const Api = () => {
   const baseURL = "http://10.10.7.106:5001/api/v1";
   const token = localStorage.getItem("token");
 
-  // Submit API Section
-  const [submitSelectedSite, setSubmitSelectedSite] = useState("");
-  const [submitSelectedEnvironment, setSubmitSelectedEnvironment] = useState("");
+  // Active Search Button State
+  const [activeSearch, setActiveSearch] = useState(null);
 
-  // Test API Section
+  // Submit API States
+  const [submitSelectedSite, setSubmitSelectedSite] = useState("");
+  const [submitSelectedEnvironment, setSubmitSelectedEnvironment] =
+    useState("");
+
+  // Test API States
   const [testSelectedSite, setTestSelectedSite] = useState("");
   const [testSelectedEnvironment, setTestSelectedEnvironment] = useState("");
 
-  // এই ফাংশন Generic বা API চাপলে কল হবে
+  // GENERIC / API BASE SEARCH POST CALL
   const handleSearchType = async (type) => {
     if (!token) {
       Swal.fire("Error", "Please login first!", "error");
@@ -45,6 +42,9 @@ const Api = () => {
         }
       );
 
+      // Activate Selected Button
+      setActiveSearch(type);
+
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -53,12 +53,13 @@ const Api = () => {
         showConfirmButton: false,
       });
     } catch (err) {
-      Swal.fire("Failed", err.response?.data?.message || "Something went wrong", "error");
+      Swal.fire(
+        "Failed",
+        err.response?.data?.message || "Something went wrong",
+        "error"
+      );
     }
   };
-
-  const handleGenericSearch = () => handleSearchType("GENERIC");
-  const handleAPIBaseSearch = () => handleSearchType("API");
 
   const handleTestAPI = () => {
     console.log("Test API clicked");
@@ -75,18 +76,24 @@ const Api = () => {
     <div className="space-y-6 flex justify-center items-center mt-5">
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-sm p-8">
         <div className="space-y-8">
+
           {/* Submit API Section */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Marketplace Name <span className="text-red-500">*</span>
             </label>
+
             <div className="relative">
-              <Listbox value={submitSelectedSite} onChange={setSubmitSelectedSite}>
+              <Listbox
+                value={submitSelectedSite}
+                onChange={setSubmitSelectedSite}
+              >
                 <div className="relative">
                   <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
                     {submitSelectedSite || "Please select"}
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                   </Listbox.Button>
+
                   <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                     {sites.map((site, idx) => (
                       <Listbox.Option
@@ -159,13 +166,18 @@ const Api = () => {
             <label className="block text-sm font-medium text-gray-700">
               Environment
             </label>
+
             <div className="relative">
-              <Listbox value={submitSelectedEnvironment} onChange={setSubmitSelectedEnvironment}>
+              <Listbox
+                value={submitSelectedEnvironment}
+                onChange={setSubmitSelectedEnvironment}
+              >
                 <div className="relative">
                   <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
                     {submitSelectedEnvironment || "Please select"}
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                   </Listbox.Button>
+
                   <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                     {environments.map((environment, index) => (
                       <Listbox.Option
@@ -188,18 +200,23 @@ const Api = () => {
             </button>
           </div>
 
-          {/* Test API Section - ঠিক তোমার আগের মতোই */}
+          {/* Test API Section */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Marketplace Name <span className="text-red-500">*</span>
             </label>
+
             <div className="relative">
-              <Listbox value={testSelectedSite} onChange={setTestSelectedSite}>
+              <Listbox
+                value={testSelectedSite}
+                onChange={setTestSelectedSite}
+              >
                 <div className="relative">
                   <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
                     {testSelectedSite || "Please select"}
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                   </Listbox.Button>
+
                   <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                     {sites.map((site, idx) => (
                       <Listbox.Option
@@ -215,7 +232,6 @@ const Api = () => {
               </Listbox>
             </div>
 
-            {/* বাকি ইনপুটগুলো একদম আগের মতোই */}
             <label className="block text-sm font-medium text-gray-700">
               Client Id <span className="text-red-500">*</span>
             </label>
@@ -273,13 +289,18 @@ const Api = () => {
             <label className="block text-sm font-medium text-gray-700">
               Environment
             </label>
+
             <div className="relative">
-              <Listbox value={testSelectedEnvironment} onChange={setTestSelectedEnvironment}>
+              <Listbox
+                value={testSelectedEnvironment}
+                onChange={setTestSelectedEnvironment}
+              >
                 <div className="relative">
                   <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
                     {testSelectedEnvironment || "Please select"}
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                   </Listbox.Button>
+
                   <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                     {environments.map((environment, index) => (
                       <Listbox.Option
@@ -302,23 +323,37 @@ const Api = () => {
             </button>
           </div>
 
-          {/* Search Buttons Section - এখানে API কল হবে */}
+          {/* Search Buttons Section (Updated Active/Inactive) */}
           <div className="flex justify-center pt-4">
             <div className="flex w-[390px] h-[99px] rounded-xl overflow-hidden shadow-sm">
+              
+              {/* GENERIC BUTTON */}
               <button
-                onClick={handleGenericSearch}
-                className="flex-1 bg-[#4A90E2] text-white font-medium py-6 px-6 transition-colors duration-200"
+                onClick={() => handleSearchType("GENERIC")}
+                className={`flex-1 font-medium py-6 px-6 transition-colors duration-200 ${
+                  activeSearch === "GENERIC"
+                    ? "bg-[#4A90E2] text-white"
+                    : "bg-white text-[#4A90E2] border-r border-[#4A90E2]"
+                }`}
               >
                 Generic Search
               </button>
+
+              {/* API BASE BUTTON */}
               <button
-                onClick={handleAPIBaseSearch}
-                className="flex-1 bg-white text-[#4A90E2] font-medium py-6 px-6 transition-colors duration-200 border-l border-[#4A90E2]"
+                onClick={() => handleSearchType("API")}
+                className={`flex-1 font-medium py-6 px-6 transition-colors duration-200 ${
+                  activeSearch === "API"
+                    ? "bg-[#4A90E2] text-white"
+                    : "bg-white text-[#4A90E2]"
+                }`}
               >
                 API Base Search
               </button>
+
             </div>
           </div>
+
         </div>
       </div>
     </div>
