@@ -8,7 +8,7 @@ const sites = ["Amazon", "Ebay", "Alibaba", "Zalando", "leroy_merlin"];
 const environments = ["Sandbox", "Production"];
 
 const Api = () => {
-  const baseURL = "http://10.10.7.106:5001/api/v1";
+  const baseURL = "https://api.yespend.com/api/v1";
   const token = localStorage.getItem("token");
 
   // Active Search Button State
@@ -192,6 +192,25 @@ const Api = () => {
                 </div>
               </Listbox>
             </div>
+
+            <label className="block text-sm font-medium text-gray-700">
+              Country
+            </label>
+
+            <input
+              type="text"
+              placeholder="Please enter country"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+            />
+
+            <label className="block text-sm font-medium text-gray-700">
+              Region
+            </label>
+            <input
+              type="text"
+              placeholder="Please enter region"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+            />
           </div>
 
           <div className="flex justify-center">
@@ -315,6 +334,24 @@ const Api = () => {
                 </div>
               </Listbox>
             </div>
+            
+            <label className="block text-sm font-medium text-gray-700">
+              Country
+            </label>
+            <input
+              type="text"
+              placeholder="Please enter country"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+            />
+
+            <label className="block text-sm font-medium text-gray-700">
+              Region
+            </label>
+            <input
+              type="text"
+              placeholder="Please enter region"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+            />
           </div>
 
           <div className="flex justify-center">

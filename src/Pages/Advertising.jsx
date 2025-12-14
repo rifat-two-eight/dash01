@@ -14,6 +14,7 @@ const Advertising = () => {
   const [tableData, setTableData] = useState([]);
   const [revenuePercentage, setRevenuePercentage] = useState("0.00");
   const [revenueChangeColor, setRevenueChangeColor] = useState("#20B146");
+  const [admobError, setAdmobError] = useState(null);
 
   const publisherId = "pub-7017672768951042";
   const currentDate = new Date();
@@ -23,7 +24,10 @@ const Advertising = () => {
   // FETCH ALL ADMOB DATA
   const fetchAdMobData = async () => {
     const accessToken = localStorage.getItem("admob_token");
-    if (!accessToken) return;
+    if (!accessToken) {
+      setAdmobError("AdMob is not connected. Please add a valid access token.");
+      return;
+    }
 
     try {
       console.log("🔑 Fetching AdMob Advertising Data...");
@@ -45,6 +49,9 @@ const Advertising = () => {
         { headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, timeout: 10000 }
       );
 
+      const getRows = (resp) => Array.isArray(resp.data) ? resp.data : (resp.data?.rows || []);
+      const monthlyRows = getRows(monthlyResponse);
+
       // 2. TODAY'S REVENUE
       const todayResponse = await axios.post(
         `https://admob.googleapis.com/v1/accounts/${publisherId}/networkReport:generate`,
@@ -62,6 +69,8 @@ const Advertising = () => {
         { headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, timeout: 10000 }
       );
 
+      const todayRows = getRows(todayResponse);
+
       // 3. LIFETIME REVENUE (Last 12 months)
       const lifetimeResponse = await axios.post(
         `https://admob.googleapis.com/v1/accounts/${publisherId}/networkReport:generate`,
@@ -78,6 +87,8 @@ const Advertising = () => {
         },
         { headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, timeout: 10000 }
       );
+
+      const lifetimeRows = getRows(lifetimeResponse);
 
       // 4. PREVIOUS MONTH (FOR % CHANGE)
       const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
@@ -102,20 +113,22 @@ const Advertising = () => {
         { headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, timeout: 10000 }
       );
 
+      const prevMonthRows = getRows(prevMonthResponse);
+
       // CALCULATE TOTALS
-      const monthlyEarnings = (monthlyResponse.data || []).reduce((sum, row) => 
+      const monthlyEarnings = (monthlyRows || []).reduce((sum, row) => 
         sum + parseFloat(row.metricValues?.[0]?.value || 0), 0
       );
       
-      const todayEarnings = (todayResponse.data || []).reduce((sum, row) => 
+      const todayEarnings = (todayRows || []).reduce((sum, row) => 
         sum + parseFloat(row.metricValues?.[0]?.value || 0), 0
       );
       
-      const lifetimeEarnings = (lifetimeResponse.data || []).reduce((sum, row) => 
+      const lifetimeEarnings = (lifetimeRows || []).reduce((sum, row) => 
         sum + parseFloat(row.metricValues?.[0]?.value || 0), 0
       );
 
-      const prevMonthEarnings = (prevMonthResponse.data || []).reduce((sum, row) => 
+      const prevMonthEarnings = (prevMonthRows || []).reduce((sum, row) => 
         sum + parseFloat(row.metricValues?.[0]?.value || 0), 0
       );
 
@@ -126,7 +139,7 @@ const Advertising = () => {
       const changeColor = parseFloat(percentageChange) >= 0 ? "#20B146" : "#ff4444";
 
       // CHART DATA (WEEKLY - Last 7 days)
-      const chartData = (monthlyResponse.data || [])
+      const chartData = (monthlyRows || [])
         .slice(-7) // Last 7 days
         .map(row => {
           const date = new Date(row.dimensions?.[0]?.value);
@@ -138,7 +151,7 @@ const Advertising = () => {
         });
 
       // TABLE DATA (Last 4 days with Impressions/Clicks)
-      const tableDataFormatted = (monthlyResponse.data || [])
+      const tableDataFormatted = (monthlyRows || [])
         .slice(-4)
         .map(row => {
           const date = new Date(row.dimensions?.[0]?.value).toLocaleDateString('MM/dd/yyyy');
@@ -163,6 +176,7 @@ const Advertising = () => {
 
     } catch (err) {
       console.error("❌ AdMob Error:", err);
+      setAdmobError("Failed to load AdMob data. Please check token and permissions.");
       // FALLBACK DATA
       setTotalAdRevenue("24.58");
       setTodaysRevenue("0.83");
@@ -174,10 +188,17 @@ const Advertising = () => {
 
   useEffect(() => {
     fetchAdMobData();
+    const intervalId = setInterval(fetchAdMobData, 60 * 60 * 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
     <div className="space-y-6 ms-16">
+      {admobError && (
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+          {admobError}
+        </div>
+      )}
       {/* 3 CARDS - DYNAMIC DATA */}
       <div className="grid grid-cols-3 gap-5">
         <div className="bg-white rounded-lg p-4">
