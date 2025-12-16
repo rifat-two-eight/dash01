@@ -22,6 +22,22 @@ const Api = () => {
   // Test API States
   const [testSelectedSite, setTestSelectedSite] = useState("");
   const [testSelectedEnvironment, setTestSelectedEnvironment] = useState("");
+  const [submitClientId, setSubmitClientId] = useState("");
+  const [submitClientSecret, setSubmitClientSecret] = useState("");
+  const [submitRefreshToken, setSubmitRefreshToken] = useState("");
+  const [submitAwsAccessKeyId, setSubmitAwsAccessKeyId] = useState("");
+  const [submitAwsSecretAccessKey, setSubmitAwsSecretAccessKey] = useState("");
+  const [submitMarketplaceId, setSubmitMarketplaceId] = useState("");
+  const [submitCountry, setSubmitCountry] = useState("");
+  const [submitRegion, setSubmitRegion] = useState("");
+  const [testClientId, setTestClientId] = useState("");
+  const [testClientSecret, setTestClientSecret] = useState("");
+  const [testRefreshToken, setTestRefreshToken] = useState("");
+  const [testAwsAccessKeyId, setTestAwsAccessKeyId] = useState("");
+  const [testAwsSecretAccessKey, setTestAwsSecretAccessKey] = useState("");
+  const [testMarketplaceId, setTestMarketplaceId] = useState("");
+  const [testCountry, setTestCountry] = useState("");
+  const [testRegion, setTestRegion] = useState("");
 
   // GENERIC / API BASE SEARCH POST CALL
   const handleSearchType = async (type) => {
@@ -61,12 +77,82 @@ const Api = () => {
     }
   };
 
-  const handleTestAPI = () => {
-    console.log("Test API clicked");
+  const handleTestAPI = async () => {
+    if (!token) {
+      Swal.fire("Error", "Please login first!", "error");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${baseURL}/marketplacecredential`,
+        {
+          marketplaceName: (testSelectedSite || "").toLowerCase(),
+          clientId: testClientId,
+          clientSecret: testClientSecret,
+          environment: (testSelectedEnvironment || "").toLowerCase(),
+          country: testCountry,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      // Show error message even on success (as per requirement)
+      Swal.fire("Failed", "not matched or error", "error");
+    } catch (err) {
+      Swal.fire("Failed", "not matched or error", "error");
+    }
   };
 
-  const handleSubmitAPI = () => {
-    console.log("Submit API clicked");
+  const handleSubmitAPI = async () => {
+    if (!token) {
+      Swal.fire("Error", "Please login first!", "error");
+      return;
+    }
+
+    // Validate required fields
+    if (!submitSelectedSite || !submitClientId || !submitClientSecret || !submitSelectedEnvironment || !submitCountry) {
+      Swal.fire("Error", "Please fill all required fields (Marketplace Name, Client Id, Client Secret, Environment, Country)", "error");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseURL}/marketplacecredential`,
+        {
+          marketplaceName: (submitSelectedSite || "").toLowerCase(),
+          clientId: submitClientId,
+          clientSecret: submitClientSecret,
+          environment: (submitSelectedEnvironment || "").toLowerCase(),
+          country: submitCountry,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: response?.data?.message || "Marketplacecredential created successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Submit API Error:", err);
+      const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
+      Swal.fire(
+        "Failed",
+        errorMessage,
+        "error"
+      );
+    }
   };
 
   const buttonClass =
@@ -116,6 +202,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitClientId}
+              onChange={(e) => setSubmitClientId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -125,6 +213,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitClientSecret}
+              onChange={(e) => setSubmitClientSecret(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -134,6 +224,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitRefreshToken}
+              onChange={(e) => setSubmitRefreshToken(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -143,6 +235,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitAwsAccessKeyId}
+              onChange={(e) => setSubmitAwsAccessKeyId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -152,6 +246,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitAwsSecretAccessKey}
+              onChange={(e) => setSubmitAwsSecretAccessKey(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -161,6 +257,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitMarketplaceId}
+              onChange={(e) => setSubmitMarketplaceId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -201,6 +299,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter country"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitCountry}
+              onChange={(e) => setSubmitCountry(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -210,6 +310,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter region"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={submitRegion}
+              onChange={(e) => setSubmitRegion(e.target.value)}
             />
           </div>
 
@@ -258,6 +360,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testClientId}
+              onChange={(e) => setTestClientId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -267,6 +371,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testClientSecret}
+              onChange={(e) => setTestClientSecret(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -276,6 +382,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testRefreshToken}
+              onChange={(e) => setTestRefreshToken(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -285,6 +393,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testAwsAccessKeyId}
+              onChange={(e) => setTestAwsAccessKeyId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -294,6 +404,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testAwsSecretAccessKey}
+              onChange={(e) => setTestAwsSecretAccessKey(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -303,6 +415,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testMarketplaceId}
+              onChange={(e) => setTestMarketplaceId(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -342,6 +456,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter country"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testCountry}
+              onChange={(e) => setTestCountry(e.target.value)}
             />
 
             <label className="block text-sm font-medium text-gray-700">
@@ -351,6 +467,8 @@ const Api = () => {
               type="text"
               placeholder="Please enter region"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+              value={testRegion}
+              onChange={(e) => setTestRegion(e.target.value)}
             />
           </div>
 

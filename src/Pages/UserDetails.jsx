@@ -224,18 +224,21 @@ useEffect(() => {
     });
   };
 
-  const handleAssignAsPro = () => {
+  const handleTogglePlan = () => {
+    const newPlan = userData.plan === "pro" ? "free" : "pro";
+    const planText = newPlan === "pro" ? "Pro" : "Free";
+    
     Swal.fire({
       title: "Are you sure?",
-      text: "This will upgrade the user to Pro plan.",
+      text: `This will change the user plan to ${planText}.`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#4A90E2",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, assign as Pro!"
+      confirmButtonText: `Yes, change to ${planText}!`
     }).then((result) => {
       if (result.isConfirmed) {
-        updateUser({ userType: "pro" });
+        updateUser({ userType: newPlan });
       }
     });
   };
@@ -365,65 +368,63 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Payment History Section - 100% Working with Correct Endpoints */}
-{/* Payment History - 100% Working with Correct Admin Route */}
-<div className="bg-white rounded-lg shadow-md p-6">
-  <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
-    <span>Purchase History</span>
-    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Admin View</span>
-  </h2>
+      {/* Payment History Section */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+          <span>Purchase History</span>
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Admin View</span>
+        </h2>
 
-  {transactionLoading ? (
-    <div className="text-center py-16">
-      <div className="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-      <p className="mt-4 text-gray-600">Loading purchase history...</p>
-    </div>
-  ) : transactionError ? (
-    <div className="text-center py-16 text-red-600 bg-red-50 rounded-lg border border-red-200">
-      {transactionError}
-    </div>
-  ) : transactions.length === 0 ? (
-    <div className="text-center py-16 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-      No purchase history found for this user
-    </div>
-  ) : (
-    <div className="overflow-x-auto border border-gray-200 rounded-lg">
-      <table className="w-full text-sm">
-        <thead className="bg-gradient-to-r from-indigo-50 to-blue-50">
-          <tr>
-            <th className="text-left py-4 px-6 font-semibold text-gray-700">Transaction ID</th>
-            <th className="text-left py-4 px-6 font-semibold text-gray-700">Plan/Item</th>
-            <th className="text-left py-4 px-6 font-semibold text-gray-700">Amount</th>
-            <th className="text-left py-4 px-6 font-semibold text-gray-700">Date</th>
-            <th className="text-left py-4 px-6 font-semibold text-gray-700">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((tx, i) => (
-            <tr key={tx._id || i} className="border-b hover:bg-gray-50 transition">
-              <td className="py-4 px-6 font-medium text-blue-600">
-                #{(tx._id || tx.transactionId || "N/A").slice(-8).toUpperCase()}
-              </td>
-              <td className="py-4 px-6">{tx.plan || tx.title || "Pro Plan"}</td>
-              <td className="py-4 px-6 font-bold text-green-600">
-                ${tx.amount || tx.price || "9.99"}
-              </td>
-              <td className="py-4 px-6 text-gray-600">
-                {tx.date || tx.time || new Date(tx.purchaseDate).toLocaleDateString()}
-              </td>
-              <td className="py-4 px-6">
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
-                  {tx.status || "Paid"}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )}
-</div>
-
+        {transactionLoading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p className="mt-4 text-gray-600">Loading purchase history...</p>
+          </div>
+        ) : transactionError ? (
+          <div className="text-center py-16 text-red-600 bg-red-50 rounded-lg border border-red-200">
+            {transactionError}
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-16 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+            No purchase history found for this user
+          </div>
+        ) : (
+          <div className="overflow-x-auto border border-gray-200 rounded-lg">
+            <table className="w-full text-sm">
+              <thead className="bg-gradient-to-r from-indigo-50 to-blue-50">
+                <tr>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-700">Transaction ID</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-700">Plan/Item</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-700">Amount</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-700">Date</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-700">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((tx, i) => (
+                  <tr key={tx._id || i} className="border-b hover:bg-gray-50 transition">
+                    <td className="py-4 px-6 font-medium text-blue-600">
+                      #{(tx._id || tx.transactionId || "N/A").slice(-8).toUpperCase()}
+                    </td>
+                    <td className="py-4 px-6">{tx.plan || tx.title || "Pro Plan"}</td>
+                    <td className="py-4 px-6 font-bold text-green-600">
+                      ${tx.amount || tx.price || "9.99"}
+                    </td>
+                    <td className="py-4 px-6 text-gray-600">
+                      {tx.date || tx.time || new Date(tx.purchaseDate).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
+                        {tx.status || "Paid"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* Admin Actions Section */}
       <div className="bg-white rounded-lg shadow-md px-6 py-4">
@@ -443,16 +444,16 @@ useEffect(() => {
             {actionLoading ? "Processing..." : userData.status === "active" ? "User Already Active" : "Unblock User"}
           </button>
           <button 
-            onClick={handleAssignAsPro}
-            disabled={actionLoading || userData.plan === "pro"}
+            onClick={handleTogglePlan}
+            disabled={actionLoading}
             className={`px-6 py-3 w-full text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 ${
-              actionLoading || userData.plan === "pro"
+              actionLoading
                 ? "bg-gray-400 opacity-50 cursor-not-allowed"
                 : "bg-[#4A90E2] hover:bg-blue-600"
             }`}
           >
             <img src="/verify.svg" alt="New Release" className="w-5 h-5" />
-            {actionLoading ? "Processing..." : userData.plan === "pro" ? "User Already Pro" : "Assign as Pro"}
+            {actionLoading ? "Processing..." : userData.plan === "pro" ? "Change to Free" : "Change to Pro"}
           </button>
           <button 
             onClick={handleBlockUser}
