@@ -82,16 +82,33 @@ const Api = () => {
       Swal.fire("Error", "Please login first!", "error");
       return;
     }
+
+    // Prepare payload
+    let payload = {};
+
+    if (testSelectedSite === "Amazon") {
+      payload = {
+        marketplaceName: (testSelectedSite || "").toLowerCase(),
+        api_key: testClientId,
+        environment: (testSelectedEnvironment || "").toLowerCase(),
+      };
+    } else {
+      payload = {
+        marketplaceName: (testSelectedSite || "").toLowerCase(),
+        clientId: testClientId,
+        clientSecret: testClientSecret,
+        environment: (testSelectedEnvironment || "").toLowerCase(),
+        country: testCountry,
+        region: testRegion,
+      };
+    }
+
+    console.log("Test API Payload:", payload);
+
     try {
       const response = await axios.post(
         `${baseURL}/marketplacecredential`,
-        {
-          marketplaceName: (testSelectedSite || "").toLowerCase(),
-          clientId: testClientId,
-          clientSecret: testClientSecret,
-          environment: (testSelectedEnvironment || "").toLowerCase(),
-          country: testCountry,
-        },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,21 +131,45 @@ const Api = () => {
     }
 
     // Validate required fields
-    if (!submitSelectedSite || !submitClientId || !submitClientSecret || !submitSelectedEnvironment || !submitCountry) {
-      Swal.fire("Error", "Please fill all required fields (Marketplace Name, Client Id, Client Secret, Environment, Country)", "error");
-      return;
+    if (submitSelectedSite === "Amazon") {
+      if (!submitSelectedSite || !submitClientId || !submitSelectedEnvironment) {
+        Swal.fire("Error", "Please fill all required fields (Marketplace Name, Api Key, Environment)", "error");
+        return;
+      }
+    } else {
+      if (!submitSelectedSite || !submitClientId || !submitClientSecret || !submitSelectedEnvironment || !submitCountry) {
+        Swal.fire("Error", "Please fill all required fields (Marketplace Name, Client Id, Client Secret, Environment, Country)", "error");
+        return;
+      }
     }
+
+    // Prepare payload
+    let payload = {};
+
+    if (submitSelectedSite === "Amazon") {
+      payload = {
+        marketplaceName: (submitSelectedSite || "").toLowerCase(),
+        api_key: submitClientId,
+        clientSecret: "",
+        environment: (submitSelectedEnvironment || "").toLowerCase(),
+        country: "",
+      };
+    } else {
+      payload = {
+        marketplaceName: (submitSelectedSite || "").toLowerCase(),
+        clientId: submitClientId,
+        clientSecret: submitClientSecret,
+        environment: (submitSelectedEnvironment || "").toLowerCase(),
+        country: submitCountry,
+      };
+    }
+
+    console.log("Submit API Payload:", payload);
 
     try {
       const response = await axios.post(
         `${baseURL}/marketplacecredential`,
-        {
-          marketplaceName: (submitSelectedSite || "").toLowerCase(),
-          clientId: submitClientId,
-          clientSecret: submitClientSecret,
-          environment: (submitSelectedEnvironment || "").toLowerCase(),
-          country: submitCountry,
-        },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -196,28 +237,32 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              Client Id <span className="text-red-500">*</span>
+              {submitSelectedSite === "Amazon" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="Please enter api key Post"
+              placeholder={submitSelectedSite === "Amazon" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={submitClientId}
               onChange={(e) => setSubmitClientId(e.target.value)}
             />
 
-            <label className="block text-sm font-medium text-gray-700">
-              Client Secret <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitClientSecret}
-              onChange={(e) => setSubmitClientSecret(e.target.value)}
-            />
+            {submitSelectedSite !== "Amazon" && (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Client Secret <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Please enter api key Post"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={submitClientSecret}
+                  onChange={(e) => setSubmitClientSecret(e.target.value)}
+                />
+              </>
+            )}
 
-            <label className="block text-sm font-medium text-gray-700">
+            {/* <label className="block text-sm font-medium text-gray-700">
               Refresh Token
             </label>
             <input
@@ -259,60 +304,96 @@ const Api = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={submitMarketplaceId}
               onChange={(e) => setSubmitMarketplaceId(e.target.value)}
-            />
+            /> */}
 
-            <label className="block text-sm font-medium text-gray-700">
-              Environment
-            </label>
+            {submitSelectedSite === "Amazon" ? (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Environment
+                </label>
 
-            <div className="relative">
-              <Listbox
-                value={submitSelectedEnvironment}
-                onChange={setSubmitSelectedEnvironment}
-              >
                 <div className="relative">
-                  <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
-                    {submitSelectedEnvironment || "Please select"}
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  </Listbox.Button>
+                  <Listbox
+                    value={submitSelectedEnvironment}
+                    onChange={setSubmitSelectedEnvironment}
+                  >
+                    <div className="relative">
+                      <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                        {submitSelectedEnvironment || "Please select"}
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      </Listbox.Button>
 
-                  <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                    {environments.map((environment, index) => (
-                      <Listbox.Option
-                        key={index}
-                        value={environment}
-                        className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
-                      >
-                        {environment}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
+                      <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        {environments.map((environment, index) => (
+                          <Listbox.Option
+                            key={index}
+                            value={environment}
+                            className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                          >
+                            {environment}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </div>
+                  </Listbox>
                 </div>
-              </Listbox>
-            </div>
+              </>
+            ) : (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Environment
+                </label>
 
-            <label className="block text-sm font-medium text-gray-700">
-              Country
-            </label>
+                <div className="relative">
+                  <Listbox
+                    value={submitSelectedEnvironment}
+                    onChange={setSubmitSelectedEnvironment}
+                  >
+                    <div className="relative">
+                      <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                        {submitSelectedEnvironment || "Please select"}
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      </Listbox.Button>
 
-            <input
-              type="text"
-              placeholder="Please enter country"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitCountry}
-              onChange={(e) => setSubmitCountry(e.target.value)}
-            />
+                      <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        {environments.map((environment, index) => (
+                          <Listbox.Option
+                            key={index}
+                            value={environment}
+                            className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                          >
+                            {environment}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </div>
+                  </Listbox>
+                </div>
 
-            <label className="block text-sm font-medium text-gray-700">
-              Region
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter region"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitRegion}
-              onChange={(e) => setSubmitRegion(e.target.value)}
-            />
+                <label className="block text-sm font-medium text-gray-700">
+                  Country
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Please enter country"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={submitCountry}
+                  onChange={(e) => setSubmitCountry(e.target.value)}
+                />
+
+                <label className="block text-sm font-medium text-gray-700">
+                  Region
+                </label>
+                <input
+                  type="text"
+                  placeholder="Please enter region"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={submitRegion}
+                  onChange={(e) => setSubmitRegion(e.target.value)}
+                />
+              </>
+            )}
           </div>
 
           <div className="flex justify-center">
@@ -354,39 +435,43 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              Client Id <span className="text-red-500">*</span>
+              {testSelectedSite === "Amazon" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="Please enter api key Post"
+              placeholder={testSelectedSite === "Amazon" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testClientId}
               onChange={(e) => setTestClientId(e.target.value)}
             />
 
-            <label className="block text-sm font-medium text-gray-700">
-              Client Secret <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testClientSecret}
-              onChange={(e) => setTestClientSecret(e.target.value)}
-            />
+            {testSelectedSite !== "Amazon" && (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Client Secret <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Please enter api key Post"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={testClientSecret}
+                  onChange={(e) => setTestClientSecret(e.target.value)}
+                />
+              </>
+            )}
 
-            <label className="block text-sm font-medium text-gray-700">
+            {/* <label className="block text-sm font-medium text-gray-700">
               Refresh Token
-            </label>
-            <input
+            </label> */}
+            {/* <input
               type="text"
               placeholder="Please enter api key Post"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testRefreshToken}
               onChange={(e) => setTestRefreshToken(e.target.value)}
-            />
+            /> */}
 
-            <label className="block text-sm font-medium text-gray-700">
+            {/* <label className="block text-sm font-medium text-gray-700">
               AWS Access Key ID
             </label>
             <input
@@ -395,9 +480,9 @@ const Api = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testAwsAccessKeyId}
               onChange={(e) => setTestAwsAccessKeyId(e.target.value)}
-            />
+            /> */}
 
-            <label className="block text-sm font-medium text-gray-700">
+            {/* <label className="block text-sm font-medium text-gray-700">
               AWS Secret Access Key
             </label>
             <input
@@ -407,7 +492,7 @@ const Api = () => {
               value={testAwsSecretAccessKey}
               onChange={(e) => setTestAwsSecretAccessKey(e.target.value)}
             />
-
+            
             <label className="block text-sm font-medium text-gray-700">
               Marketplace Id
             </label>
@@ -417,59 +502,95 @@ const Api = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testMarketplaceId}
               onChange={(e) => setTestMarketplaceId(e.target.value)}
-            />
+            /> */}
 
-            <label className="block text-sm font-medium text-gray-700">
-              Environment
-            </label>
+            {testSelectedSite === "Amazon" ? (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Environment
+                </label>
 
-            <div className="relative">
-              <Listbox
-                value={testSelectedEnvironment}
-                onChange={setTestSelectedEnvironment}
-              >
                 <div className="relative">
-                  <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
-                    {testSelectedEnvironment || "Please select"}
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  </Listbox.Button>
+                  <Listbox
+                    value={testSelectedEnvironment}
+                    onChange={setTestSelectedEnvironment}
+                  >
+                    <div className="relative">
+                      <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                        {testSelectedEnvironment || "Please select"}
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      </Listbox.Button>
 
-                  <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                    {environments.map((environment, index) => (
-                      <Listbox.Option
-                        key={index}
-                        value={environment}
-                        className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
-                      >
-                        {environment}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
+                      <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        {environments.map((environment, index) => (
+                          <Listbox.Option
+                            key={index}
+                            value={environment}
+                            className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                          >
+                            {environment}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </div>
+                  </Listbox>
                 </div>
-              </Listbox>
-            </div>
-            
-            <label className="block text-sm font-medium text-gray-700">
-              Country
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter country"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testCountry}
-              onChange={(e) => setTestCountry(e.target.value)}
-            />
+              </>
+            ) : (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Environment
+                </label>
 
-            <label className="block text-sm font-medium text-gray-700">
-              Region
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter region"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testRegion}
-              onChange={(e) => setTestRegion(e.target.value)}
-            />
+                <div className="relative">
+                  <Listbox
+                    value={testSelectedEnvironment}
+                    onChange={setTestSelectedEnvironment}
+                  >
+                    <div className="relative">
+                      <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
+                        {testSelectedEnvironment || "Please select"}
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      </Listbox.Button>
+
+                      <Listbox.Options className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        {environments.map((environment, index) => (
+                          <Listbox.Option
+                            key={index}
+                            value={environment}
+                            className="cursor-pointer px-4 py-3 border-t border-gray-300 last:border-b hover:bg-[#4A90E2] hover:text-white"
+                          >
+                            {environment}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </div>
+                  </Listbox>
+                </div>
+                
+                <label className="block text-sm font-medium text-gray-700">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  placeholder="Please enter country"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={testCountry}
+                  onChange={(e) => setTestCountry(e.target.value)}
+                />
+
+                <label className="block text-sm font-medium text-gray-700">
+                  Region
+                </label>
+                <input
+                  type="text"
+                  placeholder="Please enter region"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                  value={testRegion}
+                  onChange={(e) => setTestRegion(e.target.value)}
+                />
+              </>
+            )}
           </div>
 
           <div className="flex justify-center">
