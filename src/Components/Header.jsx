@@ -79,7 +79,7 @@ const Header = () => {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 15000,
       });
-
+// console
       console.log("User profile response:", JSON.stringify(res.data, null, 2));
       if (res.data.success && res.data.data) {
         const imageUrl = getImageUrl(res.data.data.image);
