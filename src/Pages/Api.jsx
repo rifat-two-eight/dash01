@@ -4,11 +4,12 @@ import { Listbox } from "@headlessui/react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const sites = ["Amazon", "Ebay", "Alibaba", "Zalando", "leroy_merlin"];
+const sites = ["Amazon", "Ebay", "Alibaba", "Zalando", "leroy_merlin","Ali Express"];
 const environments = ["Sandbox", "Production"];
 
 const Api = () => {
   const baseURL = "https://api.yespend.com/api/v1";
+  // const baseURL = "http://10.10.7.50:5001/api/v1";
   const token = localStorage.getItem("token");
 
   // Active Search Button State
@@ -85,16 +86,21 @@ const Api = () => {
 
     // Prepare payload
     let payload = {};
+    
+    // Format marketplace name - remove spaces and convert to lowercase
+    const formatMarketplaceName = (name) => {
+      return (name || "").toLowerCase().replace(/\s+/g, '');
+    };
 
-    if (testSelectedSite === "Amazon") {
+    if (testSelectedSite === "Amazon" || testSelectedSite === "Ali Express") {
       payload = {
-        marketplaceName: (testSelectedSite || "").toLowerCase(),
+        marketplaceName: formatMarketplaceName(testSelectedSite),
         api_key: testClientId,
         environment: (testSelectedEnvironment || "").toLowerCase(),
       };
     } else {
       payload = {
-        marketplaceName: (testSelectedSite || "").toLowerCase(),
+        marketplaceName: formatMarketplaceName(testSelectedSite),
         clientId: testClientId,
         clientSecret: testClientSecret,
         environment: (testSelectedEnvironment || "").toLowerCase(),
@@ -131,7 +137,7 @@ const Api = () => {
     }
 
     // Validate required fields
-    if (submitSelectedSite === "Amazon") {
+    if (submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express") {
       if (!submitSelectedSite || !submitClientId || !submitSelectedEnvironment) {
         Swal.fire("Error", "Please fill all required fields (Marketplace Name, Api Key, Environment)", "error");
         return;
@@ -145,10 +151,15 @@ const Api = () => {
 
     // Prepare payload
     let payload = {};
+    
+    // Format marketplace name - remove spaces and convert to lowercase
+    const formatMarketplaceName = (name) => {
+      return (name || "").toLowerCase().replace(/\s+/g, '');
+    };
 
-    if (submitSelectedSite === "Amazon") {
+    if (submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express") {
       payload = {
-        marketplaceName: (submitSelectedSite || "").toLowerCase(),
+        marketplaceName: formatMarketplaceName(submitSelectedSite),
         api_key: submitClientId,
         clientSecret: "",
         environment: (submitSelectedEnvironment || "").toLowerCase(),
@@ -156,7 +167,7 @@ const Api = () => {
       };
     } else {
       payload = {
-        marketplaceName: (submitSelectedSite || "").toLowerCase(),
+        marketplaceName: formatMarketplaceName(submitSelectedSite),
         clientId: submitClientId,
         clientSecret: submitClientSecret,
         environment: (submitSelectedEnvironment || "").toLowerCase(),
@@ -237,17 +248,17 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {submitSelectedSite === "Amazon" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
+              {submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder={submitSelectedSite === "Amazon" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
+              placeholder={submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={submitClientId}
               onChange={(e) => setSubmitClientId(e.target.value)}
             />
 
-            {submitSelectedSite !== "Amazon" && (
+            {submitSelectedSite !== "Amazon" && submitSelectedSite !== "Ali Express" && (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Client Secret <span className="text-red-500">*</span>
@@ -306,7 +317,7 @@ const Api = () => {
               onChange={(e) => setSubmitMarketplaceId(e.target.value)}
             /> */}
 
-            {submitSelectedSite === "Amazon" ? (
+            {submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
@@ -435,17 +446,17 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {testSelectedSite === "Amazon" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
+              {testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder={testSelectedSite === "Amazon" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
+              placeholder={testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testClientId}
               onChange={(e) => setTestClientId(e.target.value)}
             />
 
-            {testSelectedSite !== "Amazon" && (
+            {testSelectedSite !== "Amazon" && testSelectedSite !== "Ali Express" && (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Client Secret <span className="text-red-500">*</span>
@@ -504,7 +515,7 @@ const Api = () => {
               onChange={(e) => setTestMarketplaceId(e.target.value)}
             /> */}
 
-            {testSelectedSite === "Amazon" ? (
+            {testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
