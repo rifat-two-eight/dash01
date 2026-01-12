@@ -4,7 +4,14 @@ import { Listbox } from "@headlessui/react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const sites = ["Amazon", "Ebay", "Alibaba", "Zalando", "leroy_merlin","Ali Express"];
+const sites = [
+  "Amazon",
+  "Ebay",
+  "Alibaba",
+  "Zalando",
+  "leroy_merlin",
+  "Ali Express",
+];
 const environments = ["Sandbox", "Production"];
 
 const Api = () => {
@@ -86,10 +93,10 @@ const Api = () => {
 
     // Prepare payload
     let payload = {};
-    
+
     // Format marketplace name - remove spaces and convert to lowercase
     const formatMarketplaceName = (name) => {
-      return (name || "").toLowerCase().replace(/\s+/g, '');
+      return (name || "").toLowerCase().replace(/\s+/g, "");
     };
 
     if (testSelectedSite === "Amazon" || testSelectedSite === "Ali Express") {
@@ -122,7 +129,7 @@ const Api = () => {
           },
         }
       );
-      
+
       // Show error message even on success (as per requirement)
       Swal.fire("Failed", "not matched or error", "error");
     } catch (err) {
@@ -137,27 +144,51 @@ const Api = () => {
     }
 
     // Validate required fields
-    if (submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express") {
-      if (!submitSelectedSite || !submitClientId || !submitSelectedEnvironment) {
-        Swal.fire("Error", "Please fill all required fields (Marketplace Name, Api Key, Environment)", "error");
+    if (
+      submitSelectedSite === "Amazon" ||
+      submitSelectedSite === "Ali Express"
+    ) {
+      if (
+        !submitSelectedSite ||
+        !submitClientId ||
+        !submitSelectedEnvironment
+      ) {
+        Swal.fire(
+          "Error",
+          "Please fill all required fields (Marketplace Name, Api Key, Environment)",
+          "error"
+        );
         return;
       }
     } else {
-      if (!submitSelectedSite || !submitClientId || !submitClientSecret || !submitSelectedEnvironment || !submitCountry) {
-        Swal.fire("Error", "Please fill all required fields (Marketplace Name, Client Id, Client Secret, Environment, Country)", "error");
+      if (
+        !submitSelectedSite ||
+        !submitClientId ||
+        !submitClientSecret ||
+        !submitSelectedEnvironment ||
+        !submitCountry
+      ) {
+        Swal.fire(
+          "Error",
+          "Please fill all required fields (Marketplace Name, Client Id, Client Secret, Environment, Country)",
+          "error"
+        );
         return;
       }
     }
 
     // Prepare payload
     let payload = {};
-    
+
     // Format marketplace name - remove spaces and convert to lowercase
     const formatMarketplaceName = (name) => {
-      return (name || "").toLowerCase().replace(/\s+/g, '');
+      return (name || "").toLowerCase().replace(/\s+/g, "");
     };
 
-    if (submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express") {
+    if (
+      submitSelectedSite === "Amazon" ||
+      submitSelectedSite === "Ali Express"
+    ) {
       payload = {
         marketplaceName: formatMarketplaceName(submitSelectedSite),
         api_key: submitClientId,
@@ -188,22 +219,21 @@ const Api = () => {
           },
         }
       );
-      
+
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: response?.data?.message || "Marketplacecredential created successfully",
+        text:
+          response?.data?.message ||
+          "Marketplacecredential created successfully",
         timer: 2000,
         showConfirmButton: false,
       });
     } catch (err) {
       console.error("Submit API Error:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
-      Swal.fire(
-        "Failed",
-        errorMessage,
-        "error"
-      );
+      const errorMessage =
+        err.response?.data?.message || err.message || "Something went wrong";
+      Swal.fire("Failed", errorMessage, "error");
     }
   };
 
@@ -214,7 +244,6 @@ const Api = () => {
     <div className="space-y-6 flex justify-center items-center mt-5">
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-sm p-8">
         <div className="space-y-8">
-
           {/* Submit API Section */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
@@ -248,30 +277,41 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
+              {submitSelectedSite === "Amazon" ||
+              submitSelectedSite === "Ali Express"
+                ? "Api Key"
+                : "Client Id"}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder={submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
+              placeholder={
+                submitSelectedSite === "Amazon"
+                  ? "Provide your Rapid API key to retrieve Amazon data"
+                  : submitSelectedSite === "Ali Express"
+                  ? "Provide your Rapid API key to retrieve AliExpress data"
+                  : "Please enter API key Post"
+              }
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={submitClientId}
               onChange={(e) => setSubmitClientId(e.target.value)}
             />
 
-            {submitSelectedSite !== "Amazon" && submitSelectedSite !== "Ali Express" && (
-              <>
-                <label className="block text-sm font-medium text-gray-700">
-                  Client Secret <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Please enter api key Post"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-                  value={submitClientSecret}
-                  onChange={(e) => setSubmitClientSecret(e.target.value)}
-                />
-              </>
-            )}
+            {submitSelectedSite !== "Amazon" &&
+              submitSelectedSite !== "Ali Express" && (
+                <>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Client Secret <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Please enter api key Post"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                    value={submitClientSecret}
+                    onChange={(e) => setSubmitClientSecret(e.target.value)}
+                  />
+                </>
+              )}
 
             {/* <label className="block text-sm font-medium text-gray-700">
               Refresh Token
@@ -317,7 +357,8 @@ const Api = () => {
               onChange={(e) => setSubmitMarketplaceId(e.target.value)}
             /> */}
 
-            {submitSelectedSite === "Amazon" || submitSelectedSite === "Ali Express" ? (
+            {submitSelectedSite === "Amazon" ||
+            submitSelectedSite === "Ali Express" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
@@ -420,10 +461,7 @@ const Api = () => {
             </label>
 
             <div className="relative">
-              <Listbox
-                value={testSelectedSite}
-                onChange={setTestSelectedSite}
-              >
+              <Listbox value={testSelectedSite} onChange={setTestSelectedSite}>
                 <div className="relative">
                   <Listbox.Button className="w-full border border-gray-300 rounded-lg px-4 py-3 flex justify-between items-center">
                     {testSelectedSite || "Please select"}
@@ -446,30 +484,40 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? "Api Key" : "Client Id"} <span className="text-red-500">*</span>
+              {testSelectedSite === "Amazon" ||
+              testSelectedSite === "Ali Express"
+                ? "Api Key"
+                : "Client Id"}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder={testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? "Provide your Rapid API key to retrieve Amazon data" : "Please enter api key Post"}
+              placeholder={
+                testSelectedSite === "Amazon" ||
+                testSelectedSite === "Ali Express"
+                  ? "Provide your Rapid API key to retrieve Amazon data"
+                  : "Please enter api key Post"
+              }
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
               value={testClientId}
               onChange={(e) => setTestClientId(e.target.value)}
             />
 
-            {testSelectedSite !== "Amazon" && testSelectedSite !== "Ali Express" && (
-              <>
-                <label className="block text-sm font-medium text-gray-700">
-                  Client Secret <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Please enter api key Post"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-                  value={testClientSecret}
-                  onChange={(e) => setTestClientSecret(e.target.value)}
-                />
-              </>
-            )}
+            {testSelectedSite !== "Amazon" &&
+              testSelectedSite !== "Ali Express" && (
+                <>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Client Secret <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Please enter api key Post"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+                    value={testClientSecret}
+                    onChange={(e) => setTestClientSecret(e.target.value)}
+                  />
+                </>
+              )}
 
             {/* <label className="block text-sm font-medium text-gray-700">
               Refresh Token
@@ -515,7 +563,8 @@ const Api = () => {
               onChange={(e) => setTestMarketplaceId(e.target.value)}
             /> */}
 
-            {testSelectedSite === "Amazon" || testSelectedSite === "Ali Express" ? (
+            {testSelectedSite === "Amazon" ||
+            testSelectedSite === "Ali Express" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
@@ -578,7 +627,7 @@ const Api = () => {
                     </div>
                   </Listbox>
                 </div>
-                
+
                 <label className="block text-sm font-medium text-gray-700">
                   Country
                 </label>
@@ -613,7 +662,6 @@ const Api = () => {
           {/* Search Buttons Section (Updated Active/Inactive) */}
           <div className="flex justify-center pt-4">
             <div className="flex w-[390px] h-[99px] rounded-xl overflow-hidden shadow-sm">
-              
               {/* GENERIC BUTTON */}
               <button
                 onClick={() => handleSearchType("GENERIC")}
@@ -637,10 +685,8 @@ const Api = () => {
               >
                 API Base Search
               </button>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>
