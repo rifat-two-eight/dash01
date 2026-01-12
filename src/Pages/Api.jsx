@@ -99,7 +99,7 @@ const Api = () => {
       return (name || "").toLowerCase().replace(/\s+/g, "");
     };
 
-    if (testSelectedSite === "Amazon" || testSelectedSite === "Ali Express") {
+    if (testSelectedSite === "Amazon") {
       payload = {
         marketplaceName: formatMarketplaceName(testSelectedSite),
         api_key: testClientId,
@@ -144,10 +144,7 @@ const Api = () => {
     }
 
     // Validate required fields
-    if (
-      submitSelectedSite === "Amazon" ||
-      submitSelectedSite === "Ali Express"
-    ) {
+    if (submitSelectedSite === "Amazon") {
       if (
         !submitSelectedSite ||
         !submitClientId ||
@@ -185,10 +182,7 @@ const Api = () => {
       return (name || "").toLowerCase().replace(/\s+/g, "");
     };
 
-    if (
-      submitSelectedSite === "Amazon" ||
-      submitSelectedSite === "Ali Express"
-    ) {
+    if (submitSelectedSite === "Amazon") {
       payload = {
         marketplaceName: formatMarketplaceName(submitSelectedSite),
         api_key: submitClientId,
@@ -277,8 +271,7 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {submitSelectedSite === "Amazon" ||
-              submitSelectedSite === "Ali Express"
+              {submitSelectedSite === "Amazon"
                 ? "Api Key"
                 : "Client Id"}{" "}
               <span className="text-red-500">*</span>
@@ -288,8 +281,6 @@ const Api = () => {
               placeholder={
                 submitSelectedSite === "Amazon"
                   ? "Provide your Rapid API key to retrieve Amazon data"
-                  : submitSelectedSite === "Ali Express"
-                  ? "Provide your Rapid API key to retrieve AliExpress data"
                   : "Please enter API key Post"
               }
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
@@ -297,8 +288,7 @@ const Api = () => {
               onChange={(e) => setSubmitClientId(e.target.value)}
             />
 
-            {submitSelectedSite !== "Amazon" &&
-              submitSelectedSite !== "Ali Express" && (
+            {submitSelectedSite !== "Amazon" && (
                 <>
                   <label className="block text-sm font-medium text-gray-700">
                     Client Secret <span className="text-red-500">*</span>
@@ -313,52 +303,7 @@ const Api = () => {
                 </>
               )}
 
-            {/* <label className="block text-sm font-medium text-gray-700">
-              Refresh Token
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitRefreshToken}
-              onChange={(e) => setSubmitRefreshToken(e.target.value)}
-            />
-
-            <label className="block text-sm font-medium text-gray-700">
-              AWS Access Key ID
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitAwsAccessKeyId}
-              onChange={(e) => setSubmitAwsAccessKeyId(e.target.value)}
-            />
-
-            <label className="block text-sm font-medium text-gray-700">
-              AWS Secret Access Key
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitAwsSecretAccessKey}
-              onChange={(e) => setSubmitAwsSecretAccessKey(e.target.value)}
-            />
-
-            <label className="block text-sm font-medium text-gray-700">
-              Marketplace Id
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={submitMarketplaceId}
-              onChange={(e) => setSubmitMarketplaceId(e.target.value)}
-            /> */}
-
-            {submitSelectedSite === "Amazon" ||
-            submitSelectedSite === "Ali Express" ? (
+            {submitSelectedSite === "Amazon" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
@@ -484,8 +429,7 @@ const Api = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-700">
-              {testSelectedSite === "Amazon" ||
-              testSelectedSite === "Ali Express"
+              {testSelectedSite === "Amazon"
                 ? "Api Key"
                 : "Client Id"}{" "}
               <span className="text-red-500">*</span>
@@ -493,8 +437,7 @@ const Api = () => {
             <input
               type="text"
               placeholder={
-                testSelectedSite === "Amazon" ||
-                testSelectedSite === "Ali Express"
+                testSelectedSite === "Amazon"
                   ? "Provide your Rapid API key to retrieve Amazon data"
                   : "Please enter api key Post"
               }
@@ -503,8 +446,7 @@ const Api = () => {
               onChange={(e) => setTestClientId(e.target.value)}
             />
 
-            {testSelectedSite !== "Amazon" &&
-              testSelectedSite !== "Ali Express" && (
+            {testSelectedSite !== "Amazon" && (
                 <>
                   <label className="block text-sm font-medium text-gray-700">
                     Client Secret <span className="text-red-500">*</span>
@@ -519,52 +461,7 @@ const Api = () => {
                 </>
               )}
 
-            {/* <label className="block text-sm font-medium text-gray-700">
-              Refresh Token
-            </label> */}
-            {/* <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testRefreshToken}
-              onChange={(e) => setTestRefreshToken(e.target.value)}
-            /> */}
-
-            {/* <label className="block text-sm font-medium text-gray-700">
-              AWS Access Key ID
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testAwsAccessKeyId}
-              onChange={(e) => setTestAwsAccessKeyId(e.target.value)}
-            /> */}
-
-            {/* <label className="block text-sm font-medium text-gray-700">
-              AWS Secret Access Key
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testAwsSecretAccessKey}
-              onChange={(e) => setTestAwsSecretAccessKey(e.target.value)}
-            />
-            
-            <label className="block text-sm font-medium text-gray-700">
-              Marketplace Id
-            </label>
-            <input
-              type="text"
-              placeholder="Please enter api key Post"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4A90E2] focus:border-[#4A90E2]"
-              value={testMarketplaceId}
-              onChange={(e) => setTestMarketplaceId(e.target.value)}
-            /> */}
-
-            {testSelectedSite === "Amazon" ||
-            testSelectedSite === "Ali Express" ? (
+            {testSelectedSite === "Amazon" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Environment
